@@ -1,5 +1,5 @@
 
-\documentclass[runningheads]{llncs}
+\documentclass{report}
 
 \usepackage{listings}
 \usepackage[vlined, boxed]{algorithm2e}
@@ -7,13 +7,11 @@
 \usepackage{mathtools}
 \SetAlCapSkip{2mm}
 
-\title{Implementation and Evaluation of the FunArray Abstract Domain in Java}
-\titlerunning{Implementation and Evaluation of the FunArray Abstract Domain}
-\date{August 2024}
+\title{Implementation and Evaluation of the FunArray Abstract Domain in Java\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
+\date{September 2024}
 \author{Maximilian Hofstetter}
-\authorrunning{Maximilian Hofstetter}
-\institute{Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
-\subtitle{Bachelor's Thesis}
+%\institute{Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
+%\subtitle{Bachelor's Thesis}
 
 \newcommand{\funArray}[1]{$#1$}
 \newcommand{\bound}[1]{\{#1\}}
@@ -23,13 +21,10 @@
 
 \maketitle
 
-\section{Introduction}
-
-
-\section{Scope of Application}
-
-Lorem ipsum dolor sit amet
-
+\chapter{Introduction}
+\chapter{Background}
+\chapter{Implementation}
+\chapter{Evaluation}
 \section{Limitations}
 \subsection{Adjacent potentially empty segments}
 When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
@@ -73,6 +68,8 @@ $w,b \leftarrow$ length of $A-1$ \\
 }
 \caption{Dijkstra's proposition for an algorithm for solving the Dutch national flag problem \cite{dijkstra1976}. }\label{algo:dijkstra}
 \end{algorithm}
+
+\chapter{Conclusion}
 
 
 
