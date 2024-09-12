@@ -1,0 +1,82 @@
+
+\documentclass[runningheads]{llncs}
+
+\usepackage{listings}
+\usepackage[vlined, boxed]{algorithm2e}
+\usepackage{tikz}
+\usepackage{mathtools}
+\SetAlCapSkip{2mm}
+
+\title{Implementation and Evaluation of the FunArray Abstract Domain in Java}
+\titlerunning{Implementation and Evaluation of the FunArray Abstract Domain}
+\date{August 2024}
+\author{Maximilian Hofstetter}
+\authorrunning{Maximilian Hofstetter}
+\institute{Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
+\subtitle{Bachelor's Thesis}
+
+\newcommand{\funArray}[1]{$#1$}
+\newcommand{\bound}[1]{\{#1\}}
+\newcommand{\fvalue}[1]{\;#1\;}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+
+\section{Scope of Application}
+
+Lorem ipsum dolor sit amet
+
+\section{Limitations}
+\subsection{Adjacent potentially empty segments}
+When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
+
+When trying to expand the first segment by inserting its value $x$ at index $b$, the resulting FunArray could either be \funArray{\bound{a} \fvalue{x} \bound{b\;c} \fvalue{x} \bound{b+1}? \fvalue{z} \bound{d}}, if the $y$-segment was empty, or alternatively \funArray{\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}}, if it was non-empty. Since the position of the \funArray{\bound{c}}-bound cannot by decided, it must be discarded altogether. After the insertion, $A$ becomes \funArray{A':\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1}? \fvalue{y\sqcup z} \bound{d}} and all information concerning the variable $c$ is lost.
+
+ Analyses of programs utilising segments in their arrays with adjacent and potentially empty segments have to discard non-trivial information. Thus the FunArray's approach for handling potentially empty adjacent segments limits the number of programs for which an analysis can achieve a non-trivial result.
+ 
+ Consider Algorithm \ref{algo:dijkstra}, Dijkstra's Dutch national flag algorithm, for example. Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained   
+ 
+ \begin{algorithm}
+\DecMargin{5mm}
+\vspace{1.5mm}
+$r \leftarrow 0$\\
+$w,b \leftarrow$ length of $A-1$ \\
+\vspace{1.5mm}
+\While{ $r\leq w$}{
+    \vspace{0.7mm}
+    \vspace{0.7mm}
+    \If{$A[w]\leq -1$}{
+        \vspace{0.7mm}
+        $temp \leftarrow A[r]$\\
+        $A[r] \leftarrow A[w]$\\
+        $A[w] \leftarrow temp$\\
+        $r\leftarrow r+1$ 
+    }
+    \vspace{1mm}
+    \If{$A[w]=0$ }{
+        \vspace{0.7mm}
+        $w\leftarrow w-1$
+    }
+    \vspace{1mm}
+    \If{$A[w]\geq1$}{
+        \vspace{0.7mm}
+        $temp \leftarrow A[w]$ \\
+        $A[w] \leftarrow A[b]$\\
+        $A[b] \leftarrow temp$\\
+        $w\leftarrow w-1$ \\
+        $b\leftarrow b-1$ 
+    }
+}
+\caption{Dijkstra's proposition for an algorithm for solving the Dutch national flag problem \cite{dijkstra1976}. }\label{algo:dijkstra}
+\end{algorithm}
+
+
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{Bibliography}
+\end{document}
