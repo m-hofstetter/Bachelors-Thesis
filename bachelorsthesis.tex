@@ -25,6 +25,34 @@
 \chapter{Background}
 \chapter{Implementation}
 \chapter{Evaluation}
+
+\section{Experimental evaluation}
+
+Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by analysing the main libraries of the .NET framework and the implementation itself \cite{cousot2011}. The .NET libraries have been chosen for this since they contain a large amount of code and a vast selection of functionalities and techniques. They, however, lack an important aspect: The specification of expected properties. The authors are able to infer thousands of invariants but cannot determine whether they actually provide any useful information for the further execution of the code. To check against pre-specified properties they ran the analysis on the implementation of the FunArray itself and annotated it with pre-conditions and proof obligations. 
+
+%todo: Ist in der Ich-Perspektive schreiben okay? 
+
+I tested my implementation of the FunArray against a selection of the SV\nobreakdash-COMP benchmarks\footnote{A collection of verification tasks for the International Competition on Software Verification available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. These benchmarks each contain one or more assertions and their expected verdict. The selected benchmarks are tailored towards verifying programs dealing with arrays.
+
+\subsection{Technical aspects}
+
+%Used interval domain
+%Set amount of functionality. Everything that could not be translated from c was not tested against
+%Analysis for all benchmarks runs in few milliseconds
+
+\subsection{Verifying assertions}
+
+My implementation is able to correctly identify the result of 24 out of the 247 assertions spread among 237 benchmarks. When manually inspecting the program mechanism preceding these assertions in the benchmark, a single pattern can be identified that precedes the majority of them: Initialisation. The benchmark first initialises an array with a consistent value as its every element and immediately afterwards asserts that every element of the array has that specific value. Of the 24 correctly assessed assertions, 20 follow this pattern. The remaining four assertions follow a more complex program scheme, that involves conditions and loops.
+Cousot, Cousot and Logozzo were able to correctly assert 61 out of 1800 or 3.4\% of proof obligations when analysing the FunArray implementation using itself \cite{cousot2011}. This roughly matches my results of 24 out of 247 or 9.7\%, considering the easy initialisation assertions make up a way greater amount of my test cases than would be present in a real world program.
+
+\subsection{Invariants}
+Another method of evaluating the impact of the FunArray, that was also chosen by its inventors \cite{cousot2011}, is the analysis of loop invariants. Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a non-trivial invariant. A non-trivial invariant is defined as a state in which at least one of the arrays contains a segment whose value is not $\top$.
+This definition of non-triviality, however, does not take the FunArrays ability to depict multiple segments into account. If we were to treat all arrays as a single segment with a homogenous value across all elements, we could have gotten the same result and the same number of non-trivial invariants. We therefore narrow down the non-triviality criterion to those states containing at least one array with more than one segment and at least one segment with a value that is not $\top$. Now we arrive at 427 non-trivial invariants, which is still 45.0\%. 
+If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
+
+
+
+
 \section{Limitations}
 \subsection{Adjacent potentially empty segments}
 When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
