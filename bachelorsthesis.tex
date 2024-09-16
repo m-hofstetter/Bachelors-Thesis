@@ -35,9 +35,15 @@ Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by anal
 
 %todo: Ist in der Ich-Perspektive schreiben okay? 
 
-I tested my implementation of the FunArray against a selection of the SV\nobreakdash-COMP benchmarks\footnote{A collection of verification tasks for the International Competition on Software Verification available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. These benchmarks each contain one or more assertions and their expected verdict. The selected benchmarks are tailored towards verifying programs dealing with arrays.
+I tested my implementation of the FunArray against a selection of the SV\nobreakdash-COMP benchmarks\footnote{A collection of verification tasks for the International Competition on Software Verification available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. These benchmarks each contain one or more assertions and their expected verdict. The 237 selected benchmarks are tailored towards verifying programs dealing with arrays.
 
 \subsection{Technical aspects}
+
+The selected benchmarks have been chosen \textcolor{red}{@Gidon By what criterion have they been chosen?}. The benchmarks are available as programs written in C and have been translated into the appropriate embedded domain-specific language in Java. Since my implementation of the FunArray only supports a limited amount of C commands, not all selected benchmarks were able to be properly translated and have been omitted instead.
+
+The benchmarks have been executed with the interval abstract domain as its representation of variable values and array element values. This domain has been chosen because it is relatively simple to implement but can represent a value somewhat accurately.
+
+The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion can occur.
 
 %Used interval domain
 %Set amount of functionality. Everything that could not be translated from c was not tested against
