@@ -1,18 +1,27 @@
-
-\documentclass[twocolumn]{report}
+\documentclass{report}
 
 \usepackage{listings}
 \usepackage[vlined, boxed]{algorithm2e}
 \usepackage{tikz}
 \usepackage{hyperref}
 \usepackage{float}
-\usepackage[margin=2.2cm]{geometry}
+%\usepackage{geometry}
 \usepackage{mathtools}
+\usepackage{titlesec}
+
+
+\titleformat{\chapter}[hang]
+  {\normalfont\huge\bfseries}   % formatting for chapter title (font size, style)
+  {\thechapter.}                % the label (chapter number followed by a period)
+  {1em}                         
+  {}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
 \SetAlCapSkip{2mm}
 
 \bibliographystyle{apalike}
 
-\title{Implementation and Evaluation of the FunArray in Java\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
+\title{Implementation and Evaluation of the FunArray\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
 \date{September 2024}
 \author{Maximilian Hofstetter}
 %\institute{Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
@@ -21,6 +30,8 @@
 \newcommand{\funArray}[1]{$#1$}
 \newcommand{\bound}[1]{\{#1\}}
 \newcommand{\fvalue}[1]{\;#1\;}
+
+
 
 \begin{document}
 
@@ -57,10 +68,6 @@ The selected benchmarks have been chosen \textcolor{red}{@Gidon By what criterio
 The benchmarks have been executed with the interval abstract domain as its representation of variable values and array element values. This domain has been chosen because it is relatively simple to implement but can represent a value somewhat accurately.
 
 The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion can occur.
-
-%Used interval domain
-%Set amount of functionality. Everything that could not be translated from c was not tested against
-%Analysis for all benchmarks runs in few milliseconds
 
 \subsection{Verifying assertions}
 
