@@ -1,0 +1,33 @@
+\begin{algorithm}[tbh]
+\DecMargin{5mm}
+\vspace{1.5mm}
+$r \leftarrow 0$\\
+$w,b \leftarrow$ length of $A-1$ \\
+\vspace{1.5mm}
+\While{ $r\leq w$}{
+    \vspace{0.7mm}
+    \vspace{0.7mm}
+    \If{$A[w]\leq -1$}{
+        \vspace{0.7mm}
+        $temp \leftarrow A[r]$\\
+        $A[r] \leftarrow A[w]$\\
+        $A[w] \leftarrow temp$\\
+        $r\leftarrow r+1$ 
+    }
+    \vspace{1mm}
+    \If{$A[w]=0$ }{
+        \vspace{0.7mm}
+        $w\leftarrow w-1$
+    }
+    \vspace{1mm}
+    \If{$A[w]\geq1$}{
+        \vspace{0.7mm}
+        $temp \leftarrow A[w]$ \\
+        $A[w] \leftarrow A[b]$\\
+        $A[b] \leftarrow temp$\\
+        $w\leftarrow w-1$ \\
+        $b\leftarrow b-1$ 
+    }
+}
+\caption{Dijkstra's proposition for an algorithm for solving the Dutch national flag problem \cite{dijkstra1976}. }\label{algo:dijkstra}
+\end{algorithm}

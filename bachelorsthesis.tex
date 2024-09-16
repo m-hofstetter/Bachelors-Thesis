@@ -29,6 +29,7 @@
 \chapter{Implementation}
 \chapter{Evaluation}
 
+\input{res/dijkstra_algorithm.tex}
 \section{Experimental evaluation}
 
 Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by analysing the main libraries of the .NET framework and the implementation itself \cite{cousot2011}. The .NET libraries have been chosen for this since they contain a large amount of code and a vast selection of functionalities and techniques. They, however, lack an important aspect: The specification of expected properties. The authors are able to infer thousands of invariants but cannot determine whether they actually provide any useful information for the further execution of the code. To check against pre-specified properties they ran the analysis on the implementation of the FunArray itself and annotated it with pre-conditions and proof obligations. 
@@ -72,39 +73,6 @@ When trying to expand the first segment by inserting its value $x$ at index $b$,
  
  Consider Algorithm \ref{algo:dijkstra}, Dijkstra's Dutch national flag algorithm, for example. Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained   
  
- \begin{algorithm}
-\DecMargin{5mm}
-\vspace{1.5mm}
-$r \leftarrow 0$\\
-$w,b \leftarrow$ length of $A-1$ \\
-\vspace{1.5mm}
-\While{ $r\leq w$}{
-    \vspace{0.7mm}
-    \vspace{0.7mm}
-    \If{$A[w]\leq -1$}{
-        \vspace{0.7mm}
-        $temp \leftarrow A[r]$\\
-        $A[r] \leftarrow A[w]$\\
-        $A[w] \leftarrow temp$\\
-        $r\leftarrow r+1$ 
-    }
-    \vspace{1mm}
-    \If{$A[w]=0$ }{
-        \vspace{0.7mm}
-        $w\leftarrow w-1$
-    }
-    \vspace{1mm}
-    \If{$A[w]\geq1$}{
-        \vspace{0.7mm}
-        $temp \leftarrow A[w]$ \\
-        $A[w] \leftarrow A[b]$\\
-        $A[b] \leftarrow temp$\\
-        $w\leftarrow w-1$ \\
-        $b\leftarrow b-1$ 
-    }
-}
-\caption{Dijkstra's proposition for an algorithm for solving the Dutch national flag problem \cite{dijkstra1976}. }\label{algo:dijkstra}
-\end{algorithm}
 
 \chapter{Conclusion}
 
