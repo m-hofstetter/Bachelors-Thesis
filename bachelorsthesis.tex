@@ -39,7 +39,24 @@
 
 \chapter{Introduction}
 \chapter{Background}
+\section{Abstract Interpretation}
+\subsection{Interval Domain}
+\section{FunArray}
+\subsection{Abstractions}
+\subsection{Segmentation Functor: The FunArray}
+
+
+
+
 \chapter{Implementation}
+
+\section{Implementing the FunArray}
+\subsection{Unifying two FunArrays}
+\section{Implementing the Analyser}
+\subsection{Statements}
+\subsection{Expressions}
+
+
 \chapter{Evaluation}
 
 Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by analysing the main libraries of the .NET framework and the implementation itself \cite{cousot2011}. The .NET libraries have been chosen for this since they contain a large amount of code and a vast selection of functionalities and techniques. They, however, lack an important aspect: The specification of expected properties. The authors are able to infer thousands of invariants but cannot determine whether they actually provide any useful information for the further execution of the code. To check against pre-specified properties they ran the analysis on the implementation of the FunArray itself and annotated it with pre-conditions and proof obligations. 
@@ -69,7 +86,9 @@ If we were to increase the required number of segments to more than two, this nu
 
 \section{Limitations}
 \subsection{Relations between arrays}
-There is no 
+
+A lot of the benchmarks follow a scheme where they first initialise an array with certain values and then copy each element sequentially to another array. It then tries to assert whether the two arrays are equal or fulfil another specified relation. However in present configuration of the FunArray, this is not possible, \textcolor{red} {TODO} %todo: continue thsi
+
 \subsection{Adjacent potentially empty segments}
 When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
 
@@ -85,6 +104,9 @@ When trying to expand the first segment by inserting its value $x$ at index $b$,
 
 
 \chapter{Conclusion}
+
+Strength: Initialization of Arrays
+
 
 
 
