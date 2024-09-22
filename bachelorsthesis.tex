@@ -7,8 +7,9 @@
 \usepackage{float}
 %\usepackage{geometry}
 \usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{galois}
 \usepackage{titlesec}
-
 
 \titleformat{\chapter}[hang]
   {\normalfont\huge\bfseries}   % formatting for chapter title (font size, style)
@@ -19,7 +20,7 @@
 
 \SetAlCapSkip{2mm}
 
-\bibliographystyle{apalike}
+%\bibliographystyle{apalike}
 
 \title{Implementation and Evaluation of the FunArray\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
 \date{September 2024}
@@ -40,7 +41,114 @@
 \chapter{Introduction}
 \chapter{Background}
 \section{Abstract Interpretation}
+
+Let us take a look at the equation $8174+2938=x$. We want to determine whether $x$ has a positive or a negative value. Instead of doing mental arithmetic and actually adding $2938$ to $8174$ we almost instinctively know that $x$ must be positive because both its summands are positive. Without realising it, we abstracted the operands of the equation to its sign and calculated it with only this property. When applied to static code analysis, this strategy we just instinctively applied, is called abstract interpretation. Its main idea is that for proving a program's properties it is not necessary to run it with concrete values. Instead it can be run on the examined properties \cite{cousot2023, cousot1977}.
+
+
+\subsection{Properties}
+
+Consider a set of entities $\mathcal{E}$. A formal property $P\subseteq \wp(\mathcal{E}) $ is a set of entities that have this property \cite[chapter 8]{cousot2021}. With the set of integers as our set of entities $\mathcal{E}=\mathbb{Z}$, our ``positive'' property is defined as $P_{pos}=\{z\in \mathcal{E} \;|\; 0<z\}$ and we can define some more semantic properties like in table \ref{table:properties}.
+\begin{table}[hbt]
+\begin{center}
+  \begin{tabular}{l|l}
+  $\mathsf{false}$ & $\emptyset$\\
+   $P_{0}$ & $\{0\}$\\
+   $P_{pos}$ & $\{z\in \mathbb{Z} \;|\; 0<z\}$\\
+   $P_{neg}$ & $\{z\in \mathbb{Z} \;|\; 0>z\}$\\
+   $P_{pos0}$ & $\{z\in \mathbb{Z} \;|\; 0\leq z\}$\\
+   $P_{neg0}$ & $\{z\in \mathbb{Z} \;|\; 0\geq z\}$\\
+   $P_{even}$ & $\{z\in \mathbb{Z} \;|\; \exists k\in\mathbb{Z}:2k=z \}$ \\
+   $P_{odd}$ & $\{z\in \mathbb{Z} \;|\; \exists k\in\mathbb{Z}:2k+1=z \}$ \\
+   $P_{pos\_even}$ & $\{z\in \mathbb{Z} \;|\; z>0 \wedge \exists k\in\mathbb{Z}:2k=z \} = P_{pos} \cap P_{even}$ \\
+   $\vdots$ &$\vdots$\\
+   $\mathsf{true}$ & $\mathbb{Z}$\\
+  \end{tabular}
+  \caption{An incomplete selection of properties for $\mathbb{Z}$.}\label{table:properties}
+  \end{center}
+\end{table}
+
+We call a property $P$ ``stronger'' than $P'$ (or $P'$ ``weaker'' than $P$) if $P\subseteq P'$. Its set representation contains less elements and we therefore have more information about an element that fulfils said property. The weakest property is the $\mathsf{true}$ property that is satisfied by alle elements and the strongest is $\mathsf{false}$ which is satisfied by none \cite[chapter 8]{cousot2021}. Not all properties from $\wp(\mathcal{E})$ carry a semantic meaning. We therefore only consider the set of properties of interest $C\subseteq\wp(\mathcal{E})$. If we want to analyse the signs of integers this could be $C_{sign}=\{\mathsf{false}, P_{0}, P_{pos}, P_{neg}, P_{pos0}, P_{neg0}, P_{not0}, \mathsf{true}\}$. The poset  $\langle C,\subseteq\rangle$ is called the ``concrete domain''.
+
+\subsection{Abstraction}
+
+Now consider a set of abstract properties $A$. This is not a power set of concrete values anymore but a set of purely semantic symbols that represent abstract properties. If there exists a Galois connection $\langle C,\subseteq\rangle \galois{\alpha}{\gamma}\langle A\sqsubseteq\rangle$, we call $\langle A\sqsubseteq\rangle$ the abstract domain, $\alpha\in C\to A$ the abstraction function and $\gamma\in A\to C$ the concretisation function \cite[chapter 11]{cousot2021}. To put the working principle of Galois connections into simple terms: $A$'s elements abstract $C$'s elements and $\sqsubseteq$ works analogous in the abstract to $\subseteq$ in the concrete. More formally: $\forall P_C\in C:\forall P_A \in A:\alpha(P_C)\sqsubseteq P_A \Longleftrightarrow P_C \subseteq \gamma(P_A)$.
+
+
+
+\begin{figure}[htb]
+	
+\begin{center}
+	
+
+\begin{tikzpicture}
+			\draw (-4.5,0) -- (-6.5,1);
+            \draw (-4.5,0) -- (-4.5,1);
+            \draw (-4.5,0) -- (-2.5,1);
+            \draw (-4.5,3) -- (-6.5,2);
+            \draw (-4.5,3) -- (-4.5,2);
+            \draw (-4.5,3) -- (-2.5,2);
+            
+            \draw (-4.5,1) -- (-6.5,2);
+            \draw (-4.5,1) -- (-2.5,2);
+            \draw (-6.5,1) -- (-6.5,2);
+            \draw (-2.5,1) -- (-2.5,2);
+            \draw (-4.5,2) -- (-6.5,1);
+            \draw (-4.5,2) -- (-2.5,1);
+            
+            \draw (-4.5,0) node[fill=white!5] {$\emptyset$};
+            \draw (-6.5,1) node[fill=white!5] {$\{z\;|\;z<0\}$};
+            \draw (-4.5,1) node[fill=white!5] {$\{0\}$};
+            \draw (-2.5,1) node[fill=white!5] {$\{z\;|\;z>0\}$};
+            \draw (-6.5,2) node[fill=white!5] {$\{z\;|\;z\leq0\}$};
+            \draw (-4.5,2) node[fill=white!5] {$\{z\;|\;z\neq0\}$};
+            \draw (-2.5,2) node[fill=white!5] {$\{z\;|\;z\geq0\}$};
+            \draw (-4.5,3) node[fill=white!5] {$\mathbb{Z}$};
+
+
+
+            \draw (2,0) -- (1,1);
+            \draw (2,0) -- (2,1);
+            \draw (2,0) -- (3,1);
+            \draw (2,3) -- (1,2);
+            \draw (2,3) -- (2,2);
+            \draw (2,3) -- (3,2);
+            
+            \draw (2,1) -- (1,2);
+            \draw (2,1) -- (3,2);
+            \draw (1,1) -- (1,2);
+            \draw (3,1) -- (3,2);
+            \draw (2,2) -- (1,1);
+            \draw (2,2) -- (3,1);
+            
+            \draw (2,0) node[fill=white!5] {$\perp$};
+            \draw (1,1) node[fill=white!5] {$<0$};
+            \draw (2,1) node[fill=white!5] {$0$};
+            \draw (3,1) node[fill=white!5] {$>0$};
+            \draw (1,2) node[fill=white!5] {$\leq0$};
+            \draw (2,2) node[fill=white!5] {$\neq0$};
+            \draw (3,2) node[fill=white!5] {$\geq0$};
+            \draw (2,3) node[fill=white!5] {$\top$};
+            
+            
+            
+            \draw (-0.5,1.85) node {$\alpha$};
+            \draw [->](-1,1.6) -- (0,1.6);
+            \draw [<-](-1,1.4) -- (0,1.4);
+            \draw (-0.5,1.1) node {$\gamma$};
+            
+            \draw [<-](-8,0) -- (-8,3);
+            \draw (-8.17,1.5) node[rotate=90] {stronger};
+        \end{tikzpicture}
+        \caption{The sign properties of the concrete integer domain (left) next to the abstract sign domain (right) as a Hasse diagram. }
+\end{center}
+\end{figure}
+
 \subsection{Interval Domain}
+
+To better understand what an abstract domain is, consider a slightly more complicated one: The interval domain. 
+
+
+
 \section{FunArray}
 \subsection{Abstractions}
 \subsection{Segmentation Functor: The FunArray}
@@ -58,38 +166,43 @@
 
 
 \chapter{Evaluation}
+\textcolor{red}{-- Forschungsfragen nochmal aufgreifen}
 
-Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by analysing the main libraries of the .NET framework and the implementation itself \cite{cousot2011}. The .NET libraries have been chosen for this since they contain a large amount of code and a vast selection of functionalities and techniques. They, however, lack an important aspect: The specification of expected properties. The authors are able to infer thousands of invariants but cannot determine whether they actually provide any useful information for the further execution of the code. To check against pre-specified properties they ran the analysis on the implementation of the FunArray itself and annotated it with pre-conditions and proof obligations. 
+To evaluate 
 
-%todo: Ist in der Ich-Perspektive schreiben okay? 
+\section{Experimental Setup}
+\subsection{Benchmarks}
 
-I tested my implementation of the FunArray against a selection of the SV\nobreakdash-COMP benchmarks\footnote{A collection of verification tasks for the International Competition on Software Verification available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. These benchmarks each contain one or more assertions and their expected verdict. The 237 selected benchmarks are tailored towards verifying programs dealing with arrays.
+The International Competition on Software Verification (or SV-COMP)\footnote{More information about SV-COMP available at \url{https://sv-comp.sosy-lab.org/}} provides a set of benchmarks that can be used to compare tools for software verification\footnote{Available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. Their subcategory \textit{c/ReachSafety-Arrays} contains a collection of 433 verification tasks written in C for which the treatment of arrays is necessary to determine reachability. As such, this collection is suitable to test my implementation of the FunArray. They include at least one assertion per benchmark and its expected verdict for testing 
+The simple C programs have been translated to the embedded domain-specific language in Java using the tool Cuv\'ee \cite{ernst2020}. Since my implementation of the FunArray does not provide the entire functionality of the C language, about half of the benchmarks could not be translated. The 196 untranslatable benchmarks utilise features like the use of boolean variables, nested arrays, functions with a return value, structs and the use of the break keyword.
 
-\section{Technical aspects}
+\subsection{Formal Arguments of the FunArray}
 
-The selected benchmarks have been chosen \textcolor{red}{@Gidon By what criterion have they been chosen?}. The benchmarks are available as programs written in C and have been translated into the appropriate embedded domain-specific language in Java. Since my implementation of the FunArray only supports a limited amount of C commands, not all selected benchmarks were able to be properly translated and have been omitted instead.
+One of the FunArray's strengths is its ability to use different abstract domains for its bounds, array elements and variables without having to adapt the static analyser. For this evaluation the following abstract domains have been chosen as the FunArray functor's formal arguments: For abstracting variables and array elements the interval domain has been chosen, since it is relatively simple to implement. The chosen expression domain and therefore the abstract representation of segment bounds follows the scheme used by the FunArray's inventors \cite[section 7.2]{cousot2011}. Expressions are limited to the normal form $v+k$ where $v$ is a variable (whose value is abstracted by intervals) and $k$ is an integer constant.
 
-The benchmarks have been executed with the interval abstract domain as its representation of variable values and array element values. This domain has been chosen because it is relatively simple to implement but can represent a value somewhat accurately.
+\section{Results}
 
 The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion can occur.
 
-\section{Verifying assertions}
-
-My implementation is able to correctly identify the result of 24 out of the 247 assertions spread among 237 benchmarks. When manually inspecting the program mechanism preceding these assertions in the benchmark, a single pattern can be identified that precedes the majority of them: Initialisation. The benchmark first initialises an array with a consistent value as its every element and immediately afterwards asserts that every element of the array has that specific value. Of the 24 correctly assessed assertions, 20 follow this pattern. The remaining four assertions follow a more complex program scheme, that involves conditions and loops.
-Cousot, Cousot and Logozzo were able to correctly assert 61 out of 1800 or 3.4\% of proof obligations when analysing the FunArray implementation using itself \cite{cousot2011}. This roughly matches my results of 24 out of 247 or 9.7\%, considering the easy initialisation assertions make up a way greater amount of my test cases than would be present in a real world program.
-
-\section{Invariants}
-Another method of evaluating the impact of the FunArray, that was also chosen by its inventors \cite{cousot2011}, is the analysis of loop invariants. Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a non-trivial invariant. A non-trivial invariant is defined as a state in which at least one of the arrays contains a segment whose value is not $\top$.
+\subsection{Invariants}
+Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a non-trivial invariant. A non-trivial invariant is defined as a state in which at least one of the arrays contains a segment whose value is not $\top$.
 This definition of non-triviality, however, does not take the FunArrays ability to depict multiple segments into account. If we were to treat all arrays as a single segment with a homogenous value across all elements, we could have gotten the same result and the same number of non-trivial invariants. We therefore narrow down the non-triviality criterion to those states containing at least one array with more than one segment and at least one segment with a value that is not $\top$. Now we arrive at 427 non-trivial invariants, which is still 45.0\%. 
 If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
 
+\subsection{Verifying assertions}
 
-\section{Limitations}
-\subsection{Relations between arrays}
+My implementation is able to correctly identify the result of 24 out of the 247 assertions spread among 237 benchmarks or 9.7\% of assertions. When manually inspecting the program mechanism preceding these assertions in the benchmark, a single pattern can be identified that precedes the majority of them: Initialisation. The benchmark first initialises an array with a consistent value as its every element and immediately afterwards asserts that every element of the array has that specific value. Of the 24 correctly assessed assertions, 20 follow this pattern. The remaining four assertions follow a more complex program scheme, that involves conditions and loops.
 
-A lot of the benchmarks follow a scheme where they first initialise an array with certain values and then copy each element sequentially to another array. It then tries to assert whether the two arrays are equal or fulfil another specified relation. However in present configuration of the FunArray, this is not possible, \textcolor{red} {TODO} %todo: continue thsi
 
-\subsection{Adjacent potentially empty segments}
+
+\section{Discussion}
+\subsection{Comparison with Cousot, Cousot and Logozzo's Results}
+
+Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by analysing the main libraries of the .NET framework and the implementation itself \cite{cousot2011}. The .NET libraries have been chosen for this since they contain a large amount of code and a vast selection of functionalities and techniques. They, however, lack an important aspect: The specification of expected properties. The authors are able to infer thousands of invariants but cannot determine whether they actually provide any useful information for the further execution of the code. To check against pre-specified properties they annotated their implementation of the FunArray with pre-conditions and proof obligations and ran it on itself. They were able to correctly assert 61 out of 1800 or 3.4\% of proof obligations when analysing the FunArray implementation using itself \cite{cousot2011}. This roughly matches my results of 9.7\%, considering the easy initialisation assertions make up a way greater amount of my test cases than would be present in a real world program.
+
+\subsection{Limitations}
+
+\subsubsection{Adjacent potentially empty segments}
 When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
 
 When trying to expand the first segment by inserting its value $x$ at index $b$, the resulting FunArray could either be \funArray{\bound{a} \fvalue{x} \bound{b\;c} \fvalue{x} \bound{b+1}? \fvalue{z} \bound{d}}, if the $y$-segment was empty, or alternatively \funArray{\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}}, if it was non-empty. Since the position of the \funArray{\bound{c}}-bound cannot by decided, it must be discarded altogether. After the insertion, $A$ becomes \funArray{A':\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1}? \fvalue{y\sqcup z} \bound{d}} and all information concerning the variable $c$ is lost.
@@ -99,8 +212,6 @@ When trying to expand the first segment by inserting its value $x$ at index $b$,
  Consider Algorithm \ref{algo:dijkstra}, Dijkstra's Dutch national flag algorithm, for example. Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained   
  
 \input{res/dijkstra_algorithm.tex}
-
-
 
 
 \chapter{Conclusion}
