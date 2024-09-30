@@ -10,6 +10,8 @@
 \usepackage{amssymb}
 \usepackage{galois}
 \usepackage{titlesec}
+\usepackage{stmaryrd}
+\usepackage{fancyvrb}
 
 \titleformat{\chapter}[hang]
   {\normalfont\huge\bfseries}   % formatting for chapter title (font size, style)
@@ -40,6 +42,45 @@
 
 \chapter{Introduction}
 \chapter{Background}
+\section{Program semantics}
+
+Consider the following computer program written in some simple fictive programming language.
+
+\begin{center}
+\begin{BVerbatim}
+i := 0;
+while (i < 10) {
+    i := i + 1;
+}
+\end{BVerbatim}
+\end{center}
+
+An experienced programmer might be quick to think they know what this code is supposed to do. They however can only see the syntax of this program and have no knowledge of what the statements actually do in the made-up language. To discover what is happening we first must define the language's semantics. 
+
+
+\subsection{Environments and Expressions}
+
+Determining the meaning of a particular statement requires us to know the current state of the program. The expression \texttt{i + 1} has an entirely different result, depending on the value of the variable \texttt{i}, which is recorded in the program's concrete scalar variable environment. An environment is defined as a function $\rho\in\mathcal{R}_v$ with $\mathcal{R}_v \triangleq \mathbb{X}\mapsto\mathcal{V}$, where $\mathbb{X}$ is the set of syntactical variable names and $\mathcal{V}$ is the set of values they can take \cite{cousot2011}.
+
+Now consider the simple syntactical expression $\mathtt{e}\in\mathbb{E}$. It only contains scalar constants, scalar variable references and operators. Now $\llbracket\mathtt{e}\rrbracket\rho$ describes the semantics of \texttt{e} in the concrete variable environment $\rho$. The semantics of a variable \texttt{i} is defined as $\llbracket\mathtt{i}\rrbracket\rho=\rho(\mathtt{i})$ and the semantics of a syntactic operator $\circledast$ is defined as $\llbracket\mathtt{e_0\circledast e_1}\rrbracket\rho=\llbracket\mathtt{e_0}\rrbracket\rho \ast\llbracket\mathtt{e_1}\rrbracket\rho$ \cite{scott1971}. 
+Imagine a variable environment $\rho$, where $\rho(\mathtt{i})=1$, for example. Our previously mentioned expression \texttt{i + 1} evaluates to:
+
+\begin{equation*}
+\begin{aligned}
+\llbracket\mathtt{i \;\texttt{+}\; 1}\rrbracket\rho &=\llbracket\mathtt{i}\rrbracket\rho +\llbracket\mathtt{1}\rrbracket\rho \\
+& = \rho(\mathtt{i}) + 1\\
+& = 1+1\\
+& = 2
+\end{aligned}
+\end{equation*}
+
+
+\subsection{Transformers}
+A computer program not only contains expressions, but also commands or statements that modify the environment itself. For example, consider the environment $\rho$ where $\rho(\mathtt{i})=1$. After executing the command \texttt{i := i + 1}, the value of the variable \texttt{i} changes and therefore the environment $\rho'$ after the execution of the command is different from $\rho$. We write $\llbracket \texttt{i\;:=\;i\;+\;1} \rrbracket\rho=\rho[\mathtt{i}:=\texttt{i\;+\;1}]=\rho'$, meaning the semantics of the environment $\rho$ after executing an assignment \texttt{i\;:=\;i\;+\;1} is an environment $\rho'$ where all occurrences of \texttt{i} have been replaced by \texttt{i\;+\;1}.
+
+More generally the semantics of an assignment is defined as $\llbracket \texttt{i\;:=\;e} \rrbracket\rho=\rho[\mathtt{i}:=\texttt{e}]$ with $\rho[\mathtt{i}:=\texttt{e}](\mathtt{i})=\llbracket\mathtt{e}\rrbracket\rho$ \cite{cousot2011}. Commands that alter the environment are called transformations. They are basically functions in $\mathcal{R}_v\mapsto\mathcal{R}_v$ \cite{scott1971}.
+
+
 \section{Abstract Interpretation}
 
 Let us take a look at the equation $8174+2938=x$. We want to determine whether $x$ has a positive or a negative value. Instead of doing mental arithmetic and actually adding $2938$ to $8174$ we almost instinctively know that $x$ must be positive because both its summands are positive. Without realising it, we abstracted the operands of the equation to its sign and calculated it with only this property. When applied to static code analysis, this strategy we just instinctively applied, is called abstract interpretation. Its main idea is that for proving a program's properties it is not necessary to run it with concrete values. Instead it can be run on the examined properties \cite{cousot2023, cousot1977}.
@@ -76,6 +117,8 @@ Now consider a set of abstract properties $A$. This is not a power set of concre
 \input{res/hasse_sign.tex}
 
 \subsection{Property Transformers}
+
+
 \subsection{Fixpoint analysis}
 
 \subsection{The Interval Domain}
@@ -93,11 +136,16 @@ asdf
 
 \chapter{Implementation}
 
-\section{Implementing the FunArray}
+\section{Scalar Variables}
+\subsection{Intervals}
+\subsection{Signs}
+\section{FunArray}
 \subsection{Unifying two FunArrays}
-\section{Implementing the Analyser}
-\subsection{Statements}
-\subsection{Expressions}
+\section{Expressions}
+\subsection{Evaluation of an Expression}
+\subsection{Normalisation of an Expression}
+\section{Statements}
+
 
 
 \chapter{Evaluation}
