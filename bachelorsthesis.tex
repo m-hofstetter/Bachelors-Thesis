@@ -134,7 +134,7 @@ When executing a computer program in the concrete, there are transformer semanti
             $\geq0$ & $\perp$ & $\leq0$ & $0$     & $\geq0$ & $\leq0$ & $\top$  & $\geq0$ & $\top$  \\
             $\top$  & $\perp$ & $\top$  & $0$     & $\top$  & $\top$  & $\top$  & $\top$  & $\top$ 
         \end{tabular}
-  \caption{A table showcasing the result of the abstract property transformer $\times_\pm$ which is an abstraction of the concrete multiplication operator.}\label{table:properties}
+  \caption{A table showcasing the result of the abstract property transformer $\times_\pm$ which is an abstraction of the concrete multiplication operator.}\label{table:multiply}
   \end{center}
 \end{table}
 
@@ -170,7 +170,9 @@ I chose to only abstract integers with this domain, as the use of floating point
 
 \subsubsection{Expression operations}
 
-Table \ref{table:intervalarithmetics} shows the supported 
+Table \ref{table:intervalarithmetics} shows the supported expression arithmetics and how they are implemented. 
+
+The modulo operation over-approximates the result
 
 \include{res/interval_arithmetics}
 
@@ -180,14 +182,13 @@ Table \ref{table:intervalarithmetics} shows the supported
 \begin{table}[hbt]
 \begin{center}
 \begin{tabular}{l|l}
-           join &\\
-           meet &\\
-           widening &\\
-           narrowing &
+           join & $[\underline{x},\overline{x}]\sqcup[\underline{y},\overline{y}]=[\min(\underline{x},\underline{y}),\max(\overline{x}, \overline{y})]$\\
+           meet & $[\underline{x},\overline{x}]\sqcap[\underline{y},\overline{y}]=[\max(\underline{x},\underline{y}),\min(\overline{x}, \overline{y})]$ or $\bot$, if $\max(\underline{x},\underline{y})>\min(\overline{x}, \overline{y})$\\
+           widening&fhg
            
            
         \end{tabular}
-  \caption{Supported abstract operations for the  implemented interval domain.}\label{table:intervalabstractoperations}
+  \caption{Supported abstract operations for the  implemented interval domain. \cite{cousot1992} \label{table:intervalabstractoperations}
   \end{center}
 \end{table}
 \endgroup
