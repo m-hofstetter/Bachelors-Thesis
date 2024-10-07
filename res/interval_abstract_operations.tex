@@ -1,0 +1,25 @@
+\begingroup
+\renewcommand{\arraystretch}{1.3}
+\begin{table}[hbt]
+\begin{center}
+\begin{tabular}{l|l}
+           join & $[\underline{x},\overline{x}]\sqcup[\underline{y},\overline{y}]=[\min(\underline{x},\underline{y}),\max(\overline{x}, \overline{y})]$\\
+           meet & $[\underline{x},\overline{x}]\sqcap[\underline{y},\overline{y}]=[\max(\underline{x},\underline{y}),\min(\overline{x}, \overline{y})]$ \\&\qquad or $\bot$, if $\max(\underline{x},\underline{y})>\min(\overline{x}, \overline{y})$\\
+           widening& $[\underline{x},\overline{x}]\triangledown[\underline{y},\overline{y}]=\left[\left(
+           \begin{cases}
+           	-\infty,& \text{if } \underline{y} < \underline{x}\\
+           	\underline{x},& \text{otherwise}
+           \end{cases}
+           \right),\left(
+           \begin{cases}
+           	\infty,& \text{if } \overline{y} > \overline{x}\\
+           	\overline{x},& \text{otherwise}
+           \end{cases}
+           \right)\right]$
+           
+           
+        \end{tabular}
+  \caption{Supported abstract operations for the  implemented interval domain \cite{cousot1976}.} \label{table:intervalabstractoperations}
+  \end{center}
+\end{table}
+\endgroup

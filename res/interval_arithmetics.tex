@@ -25,9 +25,9 @@
            Euclidean division & $[\underline{x},\overline{x}]\div[\underline{y},\overline{y}]=[\min(\underline{x}\div\underline{y}, \underline{x}\div\overline{y}, \overline{x}\div\underline{y}, \overline{x}\div\overline{y}),$\\
            &$\qquad\max(\underline{x}\div\underline{y}, \underline{x}\div\overline{y}, \overline{x}\div\underline{y}, \overline{x}\div\overline{y})]$\\
            \hline
-           scalar modulo & $[\underline{x},\overline{x}]\mod s = [\underline{x} \mod s,\overline{x}\mod s]$\\
+           scalar modulo & $[\underline{x},\overline{x}]\;\%\; s = [\underline{x} \;\%\; s,\overline{x} \;\%\; s]$\\
            \hline
-           modulo & $[\underline{x},\overline{x}]\mod[\underline{y},\overline{y}]$ \\
+           modulo & $[\underline{x},\overline{x}]\;\%\;[\underline{y},\overline{y}]$ \\
            & $\qquad=\begin{cases}
            [0, \min(\overline{x},\overline{x})],& \text{if } \underline{x}\geq 0\\
            [\max(\underline{x},-\underline{y}),0],& \text{if } \underline{x}< 0 \wedge \overline{x} < 0\\
@@ -45,7 +45,7 @@
            
            
         \end{tabular}
-  \caption{Supported expression operations for the implemented interval domain. This is a simplified overview and leaves out a lot of edge cases (e.g. division by zero, infinities etc.).}\label{table:intervalarithmetics}
+  \caption{Supported expression operations for the implemented interval domain. This is a simplified overview and leaves out a lot of edge cases (e.g. division by zero, infinities etc.). It is assumed that the intervals are non-empty/reachable.}\label{table:intervalarithmetics}
   \end{center}
 \end{table}
 \endgroup
