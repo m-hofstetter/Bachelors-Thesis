@@ -1,10 +1,14 @@
 \begingroup
 \renewcommand{\arraystretch}{1.3}
-\begin{table}[hbt]
+\begin{table}[htb]
 \begin{center}
 \begin{tabular}{l|l}
+		   operation & implementation\\
+		   \hline
            join & $[\underline{x},\overline{x}]\sqcup[\underline{y},\overline{y}]=[\min(\underline{x},\underline{y}),\max(\overline{x}, \overline{y})]$\\
+           \hline
            meet & $[\underline{x},\overline{x}]\sqcap[\underline{y},\overline{y}]=[\max(\underline{x},\underline{y}),\min(\overline{x}, \overline{y})]$ \\&\qquad or $\bot$, if $\max(\underline{x},\underline{y})>\min(\overline{x}, \overline{y})$\\
+           \hline
            widening& $[\underline{x},\overline{x}]\triangledown[\underline{y},\overline{y}]=\left[\left(
            \begin{cases}
            	-\infty,& \text{if } \underline{y} < \underline{x}\\

@@ -109,7 +109,7 @@ Consider a set of entities $\mathcal{E}$. A formal property $P\subseteq \wp(\mat
 
 We call a property $P$ ``stronger'' than $P'$ (or $P'$ ``weaker'' than $P$) if $P\subseteq P'$. Its set representation contains less elements and we therefore have more information about an element that fulfils said property. The weakest property is the $\mathsf{true}$ property that is satisfied by alle elements and the strongest is $\mathsf{false}$ which is satisfied by none \cite[chapter 8]{cousot2021}. Not all properties from $\wp(\mathcal{E})$ carry a semantic meaning. We therefore only consider the set of properties of interest $C\subseteq\wp(\mathcal{E})$. If we want to analyse the signs of integers this could be $C_{sign}=\{\mathsf{false}, P_{0}, P_{pos}, P_{neg}, P_{pos0}, P_{neg0}, P_{not0}, \mathsf{true}\}$. The poset  $\langle C,\subseteq\rangle$ is called the ``concrete domain''.
 
-\subsection{Abstraction}
+\subsection{Abstraction}\label{sec:abstractinterpretation:abstraction}
 
 Now consider a set of abstract properties $A$. This is not a power set of concrete values anymore but a set of purely semantic symbols that represent abstract properties. If there exists a Galois connection $\langle C,\subseteq\rangle \galois{\alpha}{\gamma}\langle A\sqsubseteq\rangle$, we call $\langle A\sqsubseteq\rangle$ the abstract domain, $\alpha\in C\to A$ the abstraction function and $\gamma\in A\to C$ the concretisation function \cite[chapter 11]{cousot2021}. To put the working principle of Galois connections into simple terms: $A$'s elements abstract $C$'s elements and $\sqsubseteq$ works analogous in the abstract to $\subseteq$ in the concrete. More formally: $\forall P_C\in C:\forall P_A \in A:\alpha(P_C)\sqsubseteq P_A \Longleftrightarrow P_C \subseteq \gamma(P_A)$.
 
@@ -163,40 +163,40 @@ Since the focus of my work is to test the FunArray technique I have refrained fr
 
 \subsection{Intervals}
 
-I chose to only abstract integers with this domain, as the use of floating point numbers and open intervals would introduce unnecessary inaccuracies and the benchmark I later tested against only included integers as well. The implementation of the interval domain is relatively straight-forward. An interval $[a,b]$ consists of a lower limit $a$ and an upper limit $b$ with $a,b \in \mathbb{Z}\cup\{-\infty,\infty\}$. The set of $\mathbb{Z}\cup\{-\infty,\infty\}$ is implemented by the \texttt{InfInt} class. It allows calculations on infinities, such as $\infty - 10 = \infty$ or $(-4) \cdot \infty = -\infty$, by extending the operations of arithmetics in $\mathbb{Z}$. 
+I chose to only abstract integers with this domain, as the use of floating point numbers and open intervals would introduce unnecessary inaccuracies and the benchmark I later tested against only included integers as well. The implementation of the interval domain is relatively straight-forward. An interval $[a,b]$ consists of a lower limit $a$ and an upper limit $b$ with $a,b \in \mathbb{Z}\cup\{-\infty,\infty\}$. The set of $\mathbb{Z}\cup\{-\infty,\infty\}$ is implemented by the \texttt{InfInt} class. It allows calculations on infinities, such as $\infty - 10 = \infty$ or $(-4) \cdot \infty = -\infty$, by extending the operations of arithmetics in $\mathbb{Z}$. It is assumed that there are no integer overflows.
 
 
-\subsubsection{Expression operations}
+\subsubsection{Arithmetic Expression Operations}
 
 Table \ref{table:intervalarithmetics} shows the supported expression arithmetics for the \texttt{ReachableInterval} class and how they are implemented. Most operations are intuitive and follow the classical interval arithmetic \cite{dawood2011}. Operations with at least one of the operands being of the class \texttt{Unreachable} representing $\bot$, yield another \texttt{Unreachable}. 
 
 The abstraction of the modulo operation is not as straight-forward as the others. Different programming languages define their modulo operator differently. For example \texttt{7 \% -5} in C or Java yields a result of $2$ whereas the same expression in Python yields $-3$. Both results are mathematically correct, because $2 \equiv -3 \mod -5$, when talking about equivalence classes. The programming languages just translate those equivalence classes differently into integers. I chose for my interval domain to follow the semantics of C, where the sign of the result of a modulus operation is equal to the dividend's sign. The modulo operation also over-approximates the result for ease of implementation.
 
-\include{res/interval_arithmetics}
+\input{res/interval_arithmetics}
+
+
 
 \subsubsection{Abstract operations}
 
+Table \ref{table:intervalabstractoperations} shows the implementations of the abstract operations for the \texttt{Interval} class. The join $\sqcup$ and meet $\sqcap$ are basically equivalent to their concrete set operations $\cup$ and $\cap$. When the result of a meet operation $[\underline{x},\overline{x}] \sqcap [\underline{y},\overline{y}] = [\underline{z},\overline{z}]$ would be an illegal interval, such that 
+$\underline{z}>\overline{z}$, instead an \texttt{Unreachable} is returned.
 
+\input{res/interval_abstract_operations}
 
-When the resulting interval is 
+\subsubsection{Abstraction and Concretisation Functions}
 
-
-When an operation yields an illegal interval (meaning $[\underline{x},\overline{x}]$ with $\underline{x}>\overline{x}$)
-
-
-\include{res/interval_abstract_operations}
-
-
-
+The abstraction function defined in the \texttt{Domain} deviates from the mathematical definition as explained in section \ref{sec:abstractinterpretation:abstraction}. Instead of abstracting from a property (a set of integers), it abstracts from a single integer, since a concrete program only deals with integers but not with sets. The abstraction function is needed when evaluating an expression containing constants as described in section \ref{sec:expressions:evaluation}. It is implemented as $\alpha(z)=[z,z]$.
+The concretisation function $\gamma$ deviates in the same way and can only concretise intervals $\gamma([\underline{z},\overline{z}])=z$ where $z = \underline{z} = \overline{z}$. When $\underline{z} \neq \overline{z}$, the method throws a \texttt{ConcretisationException}. The concretisation function is needed for normalising expressions as described in section \ref{sec:expressions:normalisation} and the exception is being handled in that process. 
 
 \subsection{Signs}
+I also partially implemented the Sign domain to make sure that my implementation of the FunArray works as intended with different abstractions of element values. The \texttt{Sign} class however does not implement all methods defined in the \texttt{DomainValue} interface and cannot be used in a full analysis of a program.
 \section{Abstraction of arrays through the FunArray}
 \subsection{Unifying two FunArrays}
 \section{Expressions}
-\subsection{Evaluation of an Expression}
-\subsection{Normalisation of an Expression}
+\subsection{Evaluation of an Expression}\label{sec:expressions:evaluation}
+\subsection{Normalisation of an Expression}\label{sec:expressions:normalisation}
 
-\section{Statements, Conditions and Control Structures}
+\section{Statements, Conditions and Control Structures}\label{sec:statementsconditions}
 
 
 \chapter{Evaluation}
