@@ -41,7 +41,7 @@
 \begin{document}
 
 \section*{Statement of Originality}
-
+\thispagestyle{empty}
 I hereby confirm that I have written the accompanying thesis by myself, without contributions from any sources other than those cited in the text and acknowledgements. This applies also to all graphics, drawings, maps and images included in the thesis.
 
 \section*{Utilised Aids in Creating this Thesis}
@@ -272,9 +272,11 @@ The normalisation of the multiplication, division and modulo expressions is quit
 
 \section{Conditionals}\label{sec:conditions}
 
-When defining the semantics of a real world programming language like C, we would normally not only need to assign semantics to arithmetic expressions like in the previous section, but also to boolean expressions \cite{scott1971}. As my analyser is not going to be used to analyse C programs or programs in any other real world programming language, I skipped this step. 
+When defining the semantics of a real world programming language like C, we would normally not only need to assign semantics to arithmetic expressions like in the previous section, but also to boolean expressions \cite{scott1971}. As my analyser is not going to be used to analyse C programs or programs in any other real world programming language directly, I skipped this step. This means my analyser is only able to work with conditionals that are simple comparisons of arithmetic expressions. It is however possible to emulate boolean expressions by clever use of control structure. For example a conjunction is equivalent to a nested if-then-else statement and a negation is equivalent to the complement relation condition.
 
+When executing a program containing a conditional in the concrete, it is possible to determine whether the condition is satisfied or not and so, only one program branch has to be executed at a time. When interpreting it in the abstract, it is often not possible to determine this. Consider the condition \texttt{x~>=~0} for example. Under the abstract state $\rho=\{\mathtt{v}\mapsto[-1,1]\}$, this question is undecidable, as for some concrete values it true and for other it is false. The solution therefore is to execute both branches, assume the condition to be true and false respectively and in the end join the states of both branches.
 
+\noindent\textcolor{red}{TODO}
 
 
 \section{Loops}
