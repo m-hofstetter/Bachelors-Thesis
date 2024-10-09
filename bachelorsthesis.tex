@@ -13,6 +13,7 @@
 \usepackage{stmaryrd}
 \usepackage{tabularx}
 \usepackage{fancyvrb}
+\usepackage{enumitem}
 
 \titleformat{\chapter}[hang]
   {\normalfont\huge\bfseries}   % formatting for chapter title (font size, style)
@@ -22,6 +23,8 @@
 \titlespacing*{\chapter}{0pt}{0pt}{20pt}
 
 \SetAlCapSkip{2mm}
+
+\newcommand\nElement{\mathrlap{\perp}\top}
 
 \title{Implementation and Evaluation of the FunArray\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
 \date{September 2024}
@@ -155,7 +158,7 @@ asdf
 
 
 
-\section{Abstraction of Scalar Variables}
+\section{Abstraction of Scalar Variables}\label{sec:scalarvariables}
 Cousot, Cousot and Logozzo's FunArray is embedded into Clousot, an already existing static code contract analyser for the .NET framework \cite{cousot2011}. It therefore profits from an already existing abstract analysis for scalar variables. My implementation however works in a rudimentary standalone analyser and implements its own abstract domains for scalar variables.
 They are defined by the interface \texttt{DomainValue} and support only a limited amount of arithmatic operations: Addition, subtraction, multiplication, division, modulo, negation and absolute value. Operations like exponentiation or bitwise xor etc. that are available in many programming languages like C or Java, have not been implemented, which limits the amount of programs that can be analysed with my implementation. 
 
@@ -191,7 +194,29 @@ The concretisation function $\gamma$ deviates in the same way and can only concr
 \subsection{Signs}
 I also partially implemented the Sign domain to make sure that my implementation of the FunArray works as intended with different abstractions of element values. The \texttt{Sign} class however does not implement all methods defined in the \texttt{DomainValue} interface and cannot be used in a full analysis of a program.
 \section{Abstraction of arrays through the FunArray}
-\subsection{Unifying two FunArrays}
+
+The \texttt{FunArray} class provides a collection of bounds, element values and segment emptiness information. I decided against implementing the FunArray as a linked list and instead stored these values in Java collections as to make use of the Java stream API. The emptiness information is stored as boolean values (a segment can either be might-be-empty or non-empty). Array elements can take any implementation of the \texttt{DomainValue} (See section \ref{sec:scalarvariables}). Bounds are stored as \texttt{Bound} objects. The \texttt{FunArray} is immutable and when changed provides modified copies of itself.
+
+Apart from some minor utility methods, the \texttt{FunArray} provides four major methods: \texttt{get}, \texttt{insert}, \texttt{join} and \texttt{widen}. The \texttt{get} method takes a normal expression as an argument and returns the element value at that index. Since that very index might not necessarily be present in the bounds, this operation is not as trivial as it sounds. The array is traversed from the left and the rightmost bound that can be said to be less than the given index is being searched. After that, the array is traversed from the right and the leftmost bound that is greater than the index plus one is found. The result of the \texttt{get} operation then is the join of all array elements that lie between both these bounds. If it is not possible to find bounds less or greater than the given index, instead the most outer bounds of the array are being used, as it is simply assumed that no array access is ever out of bounds. The \texttt{insert} method works in a similar way. Since the desired index might not actually be present in the bounds of the array, it is not possible to directly insert the designated value. Instead, once again, the rightmost bound smaller than the index and the leftmost bound greater than the index are being searched. The bounds between them are being removed and the values between them are joined. Then a new segment with the desired value is placed in the middle of this joined segment \cite{cousot2011} . Consider an Array $A$, looking like $B_1P_1B_2[?_1]\ldots P_{n-1}B_n[?_{n-1}]$, where $B_n$ is the $n$-th bound, $P_n$ is the $n$-th value and $[?_{n}]$ is the emptiness flag for the $n$-th segment. We want to insert a value $v$ at the index $i$. The rightmost bound smaller than the index $B_l$ and the leftmost bound greater than the index $B_g$ are determined and the segments in between are being joined: $B_1P_1B_2[?_1]\ldots B_l[?_l] (\bigsqcup^{g-1}_{k=l}P_k) B_g[?_g]\ldots P_{n-1}B_n[?_{n-1}]$. Then the desired value  is inserted in this joined segment like this: $B_1P_1B_2[?_1]\ldots\allowbreak B_l[?_l] (\bigsqcup^{g-1}_{k=l}P_k)\allowbreak\, \{\,i\,\}?\, v \,\{\,i+1\,\}\, \allowbreak(\bigsqcup^{g-1}_{k=l}P_k) B_g?\ldots \allowbreak P_{n-1}B_n[?_{n-1}]$. Edge cases in which for example $i\in B_l$ are being handled, but won't be described any further here. The \texttt{join} and \texttt{widen} operations first execute a unification as described in section \ref{sec:funarray:unifying} and then join or widen the element values segment wise.
+
+\subsection{Bounds and Normal Expressions}
+
+\subsection{Unifying two FunArrays}\label{sec:funarray:unifying}
+
+Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunArray segmentations \cite{cousot2011}. It is subjectively complicated to understand at first glance and needs to handle 11 different distinct sub-cases. It is a recursive algorithm that relies on the assumption that the left side of the array is already unified, but in one case that assumption is violated, making it hard to actually implement it recursively. When I implemented it, it was also prone to errors and hard to debug. Therefore I chose to implement the unifying of two segmentations in a different iterative algorithm. The authors also mentioned that they refined their algorithm in their actual implementation of the FunArray, mentioning a ``purification step'' that sounds similar to my approach, but don't go into more detail \cite[section 12.2]{cousot2011}. As their implementation is not freely available, one could only guess that they might have actually taken a similar approach as me in the end. My algorithm works as follows for two FunArrays $A$ and $B$ and their respective neutral elements $\nElement_A$ and $\nElement_B$:
+\begin{enumerate}
+  \item  Remove all expressions in the bounds of $A$ and $B$ that are only present in either of them but not both.
+  \item \label{item:removeemptybounds} If that leaves empty bounds, such that there is no expression in them left, remove that bound and merge the adjacent segment values via the join operation. Set the might-be-empty flag for that new segment only if both its predecessors had it.
+  \item Now traverse the bounds of both FunArrays from left to right. Treat the bounds as sets of expressions. The current bounds are denoted as $B_A$ and $B_B$.
+  \begin{enumerate}[label*=\arabic*.]
+    \item If $B_A \cup B_B = \emptyset$, replace $B_A$ and $B_B$ with empty bounds and go on to the next bounds.
+    \item If $B_A \cup B_B \neq \emptyset$, add a bound $B_A \setminus B_B$ to the right of $B_A$. Add an element value $\nElement_A$ in between them and set the might-be-empty flag to true. Add a bound $B_B \setminus B_A$ to the right of $B_B$ analogously. Replace both $B_A$ and $B_B$ with $B_A \cup B_B$. Go on to the newly created bounds to the right.
+  \end{enumerate}
+  \item Finally remove all empty bounds in the resulting FunArrays, as described in Step~\ref{item:removeemptybounds}.
+\end{enumerate}
+
+\textcolor{red}{Frage @Gidon: muss ich hier irgendwie beweisen, dass der Algorithmus ein korrektes Ergebnis liefert?}
+
 \section{Expressions}
 \subsection{Evaluation of an Expression}\label{sec:expressions:evaluation}
 \subsection{Normalisation of an Expression}\label{sec:expressions:normalisation}
