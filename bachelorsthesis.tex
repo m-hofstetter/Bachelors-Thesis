@@ -222,11 +222,22 @@ Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunA
   \item Finally remove all empty bounds in the resulting FunArrays, as described in Step~\ref{item:removeemptybounds}.
 \end{enumerate}
 
-\textcolor{red}{Frage @Gidon: muss ich hier irgendwie beweisen, dass der Algorithmus ein korrektes Ergebnis liefert?}
+\textcolor{red}{Frage @Gidon: sollte ich hier irgendwie beweisen, dass der Algorithmus ein korrektes Ergebnis liefert?}
 \section{States}
-\section{Expressions}\label{sec:expressions}
+\section{Arithmetic Expressions}\label{sec:expressions}
+
+Arithmetic expressions are defined in the \texttt{Expression} interface. I implemented the three atomic expressions \texttt{Constant}, \texttt{Variable} and \texttt{ArrayElement} and the five expression operations \texttt{Addition}, \texttt{Subtraction}, \texttt{Multiplication}, \texttt{Division} and \texttt{Modulo}. 
+
 \subsection{Evaluation of an Expression}\label{sec:expressions:evaluation}
+Evaluating an expression is basically the same as determining its abstract semantics under the current state. Since the \texttt{DomainValue} class has the five arithmetic operations already defined as methods, the evaluation implementation of the expression operations is obvious. The evaluation of the three atomic expressions however is not as simple. Since the FunArray allows differing value domains for variables and its elements, it might not possible to calculate with those straight-away. The constant expression represents a concrete constant value and therefore lies in yet another domain. Cousot, Cousot and Logozzo chose to evaluate their expressions in the variable domain \cite{cousot2011}. There is no immediately obvious reason as to why an evaluation in the array element domain should not be considered, but I chose to follow their lead nevertheless. Therefore, two translation functions are needed to translate the concrete constant values and the array element values into the appropriate value in the variable value domain. The former is simply the abstraction function $\alpha$ which is provided by the \texttt{Domain} class and the latter called \texttt{convert\allowbreak{}Array\allowbreak{}Element\allowbreak{}Value\allowbreak{}To\allowbreak{}Variable\allowbreak{}Value} is provided by the \texttt{AnalysisContext}interface. When both variables and array elements are being abstracted into the same domain, this is simply the identity function. Its opposite, \texttt{convert\allowbreak{}Variable\allowbreak{}Value\allowbreak{}ToArray\allowbreak{}Element\allowbreak{}Value}, is needed when the calculated value of an expression is supposed to be assigned to an array element.
+
+
 \subsection{Normalisation of an Expression}\label{sec:expressions:normalisation}
+
+Since general expressions (that are not already in normal form) are being used as indeces when assigning a value to an array element, they need to be able to be brought into normal form. Consider the expression \texttt{a + b} and the state $\rho$
+
+
+\section{Conditions}\label{sec:conditions}
 
 \section{Statements, Conditions and Control Structures}\label{sec:statementsconditions}
 
