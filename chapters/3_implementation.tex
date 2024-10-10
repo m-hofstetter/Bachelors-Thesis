@@ -50,23 +50,23 @@ The \texttt{Bound} class is a wrapper for a set of \texttt{NormalExpression} tha
 
 Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunArray segmentations \cite{cousot2011}. It is subjectively complicated to understand at first glance and needs to handle 11 different distinct sub-cases. It is a recursive algorithm that relies on the assumption that the left side of the array is already unified, but in one case that assumption is violated, making it hard to actually implement it recursively. When I implemented it, it was also prone to errors and hard to debug. Therefore I chose to implement the unifying of two segmentations in a different iterative algorithm. The authors also mentioned that they refined their algorithm in their actual implementation of the FunArray, mentioning a ``purification step'' that sounds similar to my approach, but don't go into more detail \cite[section 12.2]{cousot2011}. As their implementation is not freely available, one could only guess that they might have actually taken a similar approach as me in the end. My algorithm works as follows:
 \begin{enumerate}
-  \item Consider two FunArrays $A=B_{A1}P_{A1}B_{A2}[?_{A1}]\ldots B_{An}[?_{An-1}]$ and $B=B_{B1}\allowbreak P_{B1}\allowbreak B_{B2}\allowbreak[?_{B1}]\ldots B_{Bm}[?_{Bm-1}]$, with bounds $B$ being treated as sets of expressions $\{\mathtt{e}_1, \mathtt{e}_2,\ldots\}$. Also consider their respective neutral elements $\nElement_A,\nElement_B\in \{\bot,\top\}$
-  \item \label{item:restrictexpressions} Replace all $B_{Ai}$ with $B_{Ai}\cap(B_{B1}\cup B_{B2}\cup\ldots)$, therefore removing all expressions in the bounds of $A$ and $B$ that are only present in either of them but not both.
-  \item \label{item:removeemptybounds} If that leaves empty bounds, such that $B_{i}=\emptyset$, remove that bound and merge the adjacent segment values via the join operation. The Array
+  \item Consider two FunArrays $A=B_{1}P_{1}B_{2}[?_{1}]\ldots B_{n}[?_{An-1}]$ and $A'=B'_{1}\allowbreak P'_{1}\allowbreak B'_{2}\allowbreak[?'_{1}]\ldots B'_{m}[?'_{m-1}]$, with bounds being treated as sets of expressions $\{\mathtt{e}_1, \mathtt{e}_2,\ldots\}$. Also consider their respective neutral elements $\nElement,\nElement'\in \{\bot,\top\}$
+  \item \label{item:restrictexpressions} Replace all $B_{i}$ with $B_{i}\cap(B'_{1}\cup B'_{2}\cup\ldots)$, therefore removing all expressions in the bounds of $A$ and $A'$ that are only present in either of them but not both.
+  \item \label{item:removeemptybounds} If that leaves empty bounds in either FunArray, such that $B_{i}=\emptyset$, remove that bound and merge the adjacent segment values via the join operation. The Array
   $X = \ldots B_{i-1}[?_{i-2}]\allowbreak P_{i-1} \allowbreak B_{i} [?_{i-1}] P_{i} B_{i+1} [?_{i}]\ldots$
   then becomes 
   $X'=\ldots B_{i-1}[?_{i-2}] \allowbreak P_{i-1}  \,\sqcup\, P_{i} B_{i+1} [?_{i-1} \,\sqcup\, ?_{i}]\ldots$
-  \item \label{item:traverse} Now traverse the bounds of both FunArrays from left to right.
+  \item \label{item:traverse} Now traverse the bounds of both FunArrays from left to right, with $B_{i}$ and $B'_{j}$ denoting the current bounds. 
   \begin{enumerate}[label*=\arabic*.]
-  	\item If $B_{Ai} = B_{Bi}$, go on go on to the next bounds $B_{Ai+1}$ and $B_{Bi+1}$.
-    \item If $B_{Ai} \cup B_{Bi} = \emptyset$, replace $B_{Ai}$ and $B_{Bi}$ with empty bounds and go on to the next bounds $B_{Ai+1}$ and $B_{Bi+1}$.
-    \item \label{item:truesubset} If $B_{Bi} \subsetneqq B_{Ai}$, add a neutral segment, so that $A=\ldots B_{Ai}P_{Ai}\allowbreak B_{Ai+1}\ldots$ becomes $A'=\ldots (B_{Ai} \cup B_{Bi}) \;\nElement_A\, (B_{Ai} \setminus B_{Bi}) P_{Ai}B_{Ai+1}\ldots$
-    \item If $B_{Ai} \subsetneqq B_{Bi}$, do the analogous for $B$.
+  	\item If $B_{i} = B'_{j}$, go on go on to the next bounds $B_{Ai+1}$ and $B_{Bi+1}$.
+    \item If $B_{i} \cup B'_{i} = \emptyset$, replace $B_{i}$ and $B'_{Bj}$ with empty bounds and go on to the next bounds $B_{i+1}$ and $B'_{j+1}$.
+    \item \label{item:truesubset} If $B_{i} \subsetneqq B'_{j}$, add a neutral segment, so that $A=\ldots B_{i}P_{i}\allowbreak B_{i+1}\ldots$ becomes $\overline{A}=\ldots (B_{i} \cup B_{i}) \;\nElement\, (B_{i} \setminus B_{i}) P_{i}B_{i+1}\ldots$
+    \item If $B_{i} \subsetneqq B'_{j}$, do the analogous for $A'$.
   \end{enumerate}
   \item Finally remove all empty bounds in the resulting FunArrays, as described in Step~\ref{item:removeemptybounds}.
 \end{enumerate}
 
-\noindent The two resulting FunArrays $A'$ and $B'$ have an identical segmentation, meaning their bounds are the same in the same order. The algorithm only ever introduces new segments with a value $\nElement\in\{\bot,\top\}$, that might be empty. When the value of that element is $\top$, the resulting Array $A'$ is an over-approximation of $A$. When that element is $\bot$, the resulting Array $A'$ is actually equal to $A$, as their are no concrete values, that are abstracted by $\bot$ and the segment therefore must be empty. We can therefore say that the resulting Arrays from this algorithm are over-approximations of their respective predecessors: $A\sqsubseteq A'$ and $B\sqsubseteq B'$.
+\noindent The two resulting FunArrays $\overline{A}$ and $\overline{A'}$ have an identical segmentation, meaning their bounds are the same in the same order. The algorithm only ever introduces new segments with a value $\nElement\in\{\bot,\top\}$, that might be empty. When the value of that element is $\top$, the resulting Array $\overline{A}$ is an over-approximation of $A$. When that element is $\bot$, the resulting Array $\overline{A}$ is actually equal to $A$, as their are no concrete values, that are abstracted by $\bot$ and the segment therefore must be empty. We can therefore say that the resulting Arrays from this algorithm are over-approximations of their respective predecessors: $A\sqsubseteq \overline{A}$ and $A'\sqsubseteq \overline{A'}$.
 
 \input{res/unification_example.tex}
 
