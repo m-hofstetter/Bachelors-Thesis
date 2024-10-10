@@ -79,7 +79,7 @@ Suppose we want to join two states of a FunArray \texttt{\string{0 i\string} $\t
 \end{center}
 
 
-\noindent This leaves no empty bounds, meaning we can proceed with step \ref{item:traverse}. We examine the first bound of each FunArray. Since \texttt{\string{0,i\string}} $\cup$ \texttt{\string{0\string}} $\neq\emptyset$
+\noindent This leaves no empty bounds, meaning we can proceed with step \ref{item:traverse}. We examine the first bound of each FunArray. Since \texttt{\string{0\string}} $\subsetneqq$ \texttt{\string{0,i\string}}, we insert a possibly empty neutral segment into the left FunArray as in step \ref{item:truesubset}
 
 
 \vspace{0.2cm}
@@ -126,3 +126,29 @@ Suppose we want to join two states of a FunArray \texttt{\string{0 i\string} $\t
     \draw (9,-0.25) node {\texttt{\string{n\string}}};    
 \end{tikzpicture}
 \end{center}
+
+
+\noindent We have now arrived at two unified FunArrays whose segment bounds are identical. Their segmentwise join is the following:
+
+\vspace{0.2cm}
+\begin{center}
+\begin{tikzpicture}
+	\draw (0,0)[dashed] -- (4,0);
+    \draw (0,0.5)[dashed] -- (4,0.5);
+
+    \draw (0,0)[dashed] -- (0,0.5);
+    \draw (0,-0.25) node {\texttt{\string{0\string}}};
+
+    \draw (1,-0.05) node[anchor=south] {$[0,0]$};
+
+    \draw (2,0)[dashed] -- (2,0.5);
+    \draw (2,-0.25) node {\texttt{\string{i\string}}};
+    
+    \draw (3,0) node[anchor=south] {$\top$};
+    
+    \draw (4,0)[dashed] -- (4,0.5);
+    \draw (4,-0.25) node {\texttt{\string{n\string}}};
+\end{tikzpicture}
+\end{center}
+
+\noindent Which is the same result Cousot, Cousot and Logozzo have arrived at with their algorithm \cite{cousot2011}.

@@ -58,8 +58,10 @@ Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunA
   $X'=\ldots B_{i-1}[?_{i-2}] \allowbreak P_{i-1}  \,\sqcup\, P_{i} B_{i+1} [?_{i-1} \,\sqcup\, ?_{i}]\ldots$
   \item \label{item:traverse} Now traverse the bounds of both FunArrays from left to right.
   \begin{enumerate}[label*=\arabic*.]
+  	\item If $B_{Ai} = B_{Bi}$, go on go on to the next bounds $B_{Ai+1}$ and $B_{Bi+1}$.
     \item If $B_{Ai} \cup B_{Bi} = \emptyset$, replace $B_{Ai}$ and $B_{Bi}$ with empty bounds and go on to the next bounds $B_{Ai+1}$ and $B_{Bi+1}$.
-    \item If $B_{Ai} \cup B_{Bi} \neq \emptyset$, add a neutral segment, so that $A=\ldots B_{Ai}P_{Ai}\allowbreak B_{Ai+1}\ldots$ becomes $A'=\ldots (B_{Ai} \cup B_{Bi}) \;\nElement_A\, (B_{Ai} \setminus B_{Bi}) P_{Ai}B_{Ai+1}\ldots$. Skip this if $B_{Ai} \setminus B_{Bi}=\emptyset$. Add a segment with value $\nElement_B$ in $B$ analogously.
+    \item \label{item:truesubset} If $B_{Bi} \subsetneqq B_{Ai}$, add a neutral segment, so that $A=\ldots B_{Ai}P_{Ai}\allowbreak B_{Ai+1}\ldots$ becomes $A'=\ldots (B_{Ai} \cup B_{Bi}) \;\nElement_A\, (B_{Ai} \setminus B_{Bi}) P_{Ai}B_{Ai+1}\ldots$
+    \item If $B_{Ai} \subsetneqq B_{Bi}$, do the analogous for $B$.
   \end{enumerate}
   \item Finally remove all empty bounds in the resulting FunArrays, as described in Step~\ref{item:removeemptybounds}.
 \end{enumerate}
