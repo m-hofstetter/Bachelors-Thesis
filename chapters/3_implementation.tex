@@ -1,7 +1,4 @@
 \chapter{Implementation}
-
-
-
 \section{Scalar Variables}\label{sec:scalarvariables}
 Cousot, Cousot and Logozzo's FunArray is embedded into Clousot, an already existing static code contract analyser for the .NET framework \cite{cousot2011}. It therefore profits from an already existing abstract analysis for scalar variables. My implementation however works in a rudimentary standalone analyser and implements its own abstract domains for scalar variables.
 They are defined by the interface \texttt{DomainValue} and support only a limited amount of arithmatic operations: Addition, subtraction, multiplication, division, modulo, negation and absolute value. Operations like exponentiation or bitwise xor etc. that are available in many programming languages like C or Java, have not been implemented, which limits the amount of programs that can be analysed with my implementation. 
@@ -9,34 +6,32 @@ They are defined by the interface \texttt{DomainValue} and support only a limite
 Since the focus of my work is to test the FunArray technique I have refrained from implementing more complicated abstract domains (that would have delivered more precise results), like for example the relational approach of polyhedra \cite{cousot1978}. Instead I primarily focused on the interval domain. To prove that the FunArray works with different scalar variable abstractions I also partially implemented the sign domain.
 
 \subsection{Intervals}
-
 I chose to only abstract integers with this domain, as the use of floating point numbers and open intervals would introduce unnecessary inaccuracies and the benchmark I later tested against only included integers as well. The implementation of the interval domain is relatively straight-forward. An interval $[a,b]$ consists of a lower limit $a$ and an upper limit $b$ with $a,b \in \mathbb{Z}\cup\{-\infty,\infty\}$. The set of $\mathbb{Z}\cup\{-\infty,\infty\}$ is implemented by the \texttt{InfInt} class. It allows calculations on infinities, such as $\infty - 10 = \infty$ or $(-4) \cdot \infty = -\infty$, by extending the operations of arithmetics in $\mathbb{Z}$. It is assumed that there are no integer overflows.
 
-
 \subsubsection{Arithmetic Expression Operations}
-
 Table \ref{table:intervalarithmetics} shows the supported expression arithmetics for the \texttt{ReachableInterval} class and how they are implemented. Most operations are intuitive and follow the classical interval arithmetic \cite{dawood2011}. Operations with at least one of the operands being of the class \texttt{Unreachable} representing $\bot$, yield another \texttt{Unreachable}. 
 
 The abstraction of the modulo operation is not as straight-forward as the others. Different programming languages define their modulo operator differently. For example \texttt{7 \% -5} in C or Java yields a result of $2$ whereas the same expression in Python yields $-3$. Both results are mathematically correct, because $2 \equiv -3 \mod -5$, when talking about equivalence classes. The programming languages just translate those equivalence classes differently into integers. I chose for my interval domain to follow the semantics of C, where the sign of the result of a modulus operation is equal to the dividend's sign. The modulo operation also over-approximates the result for ease of implementation.
 
 \input{res/interval_arithmetics}
 
-
-
 \subsubsection{Abstract operations}
-
 Table \ref{table:intervalabstractoperations} shows the implementations of the abstract operations for the \texttt{Interval} class. The join $\sqcup$ and meet $\sqcap$ are basically equivalent to their concrete set operations $\cup$ and $\cap$. When the result of a meet operation $[\underline{x},\overline{x}] \sqcap [\underline{y},\overline{y}] = [\underline{z},\overline{z}]$ would be an illegal interval, such that 
 $\underline{z}>\overline{z}$, instead an \texttt{Unreachable} is returned.
 
 \input{res/interval_abstract_operations}
 
 \subsubsection{Abstraction and Concretisation Functions}
-
 The abstraction function defined in the \texttt{Domain} deviates from the mathematical definition as explained in section \ref{sec:abstractinterpretation:abstraction}. Instead of abstracting from a property (a set of integers), it abstracts from a single integer, since a concrete program only deals with integers but not with sets. The abstraction function is needed when evaluating an expression containing constants as described in section \ref{sec:expressions:evaluation}. It is implemented as $\alpha(z)=[z,z]$.
 The concretisation function $\gamma$ deviates in the same way and can only concretise intervals $\gamma([\underline{z},\overline{z}])=z$ where $z = \underline{z} = \overline{z}$. When $\underline{z} \neq \overline{z}$, the method throws a \texttt{ConcretisationException}. The concretisation function is needed for normalising expressions as described in section \ref{sec:expressions:normalisation} and the exception is being handled in that process. 
 
 \subsection{Signs}
 I also partially implemented the Sign domain to make sure that my implementation of the FunArray works as intended with different abstractions of element values. The \texttt{Sign} class however does not implement all methods defined in the \texttt{DomainValue} interface and cannot be used in a full analysis of a program.
+
+
+
+
+
 \section{Arrays}
 
 The \texttt{FunArray} class provides a collection of bounds, element values and segment emptiness information. I decided against implementing the FunArray as a linked list and instead stored these values in Java collections as to make use of the Java stream API. The emptiness information is stored as boolean values (a segment can either be might-be-empty or non-empty). Array elements can take any implementation of the \texttt{DomainValue} (See section \ref{sec:scalarvariables}). Bounds are stored as \texttt{Bound} objects. The \texttt{FunArray} is immutable and when changed provides modified copies of itself.
@@ -66,7 +61,17 @@ Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunA
 \end{enumerate}
 
 \noindent\textcolor{red}{Frage @Gidon: sollte ich hier irgendwie beweisen, dass der Algorithmus ein korrektes Ergebnis liefert?}
+
+
+
+
+
 \section{States}
+
+
+
+
+
 \section{Arithmetic Expressions}\label{sec:expressions}
 
 Arithmetic expressions are defined in the \texttt{Expression} interface. I implemented the three atomic expressions \texttt{Constant}, \texttt{Variable} and \texttt{ArrayElement} and the five expression operations \texttt{Addition}, \texttt{Subtraction}, \texttt{Multiplication}, \texttt{Division} and \texttt{Modulo}. 
@@ -102,7 +107,17 @@ Normalising a constant expression \texttt{k} is trivial, as its normal form is s
 
 The normalisation of the multiplication, division and modulo expressions is quite similar to the constant normalisation. As there es no general way to rearrange them into normal form, they can only be normalised, when their evaluation can be concretised into the constant part of the normal form. Of course there are certain refinements that could be done here, like rearranging multiplications into additions when a factor can be concretised. These opportunities have not been seized to keep the process of normalisation as simple as possible and as these refinements would probably only yield a marginal reward. 
 
+
+
+
+
+
 \section{Assignments}
+
+
+
+
+
 
 \section{Conditionals}\label{sec:conditions}
 
@@ -111,6 +126,9 @@ When defining the semantics of a real world programming language like C, we woul
 When executing a program containing a conditional in the concrete, it is possible to determine whether the condition is satisfied or not and so, only one program branch has to be executed at a time. When interpreting it in the abstract, it is often not possible to determine this. Consider the condition \texttt{x~>=~0} for example. Under the abstract state $\rho=\{\mathtt{v}\mapsto[-1,1]\}$, this question is undecidable, as for some concrete values it true and for other it is false. The solution therefore is to execute both branches, assume the condition to be true and false respectively and in the end join the states of both branches.
 
 \noindent\textcolor{red}{TODO}
+
+
+
 
 
 \section{Loops}
