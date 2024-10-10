@@ -66,11 +66,7 @@ Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunA
 
 \noindent The two resulting FunArrays $A'$ and $B'$ have an identical segmentation, meaning their bounds are the same in the same order. The algorithm only ever introduces new segments with a value $\nElement\in\{\bot,\top\}$, that might be empty. When the value of that element is $\top$, the resulting Array $A'$ is an over-approximation of $A$. When that element is $\bot$, the resulting Array $A'$ is actually equal to $A$, as their are no concrete values, that are abstracted by $\bot$ and the segment therefore must be empty. We can therefore say that the resulting Arrays from this algorithm are over-approximations of their respective predecessors: $A\sqsubseteq A'$ and $B\sqsubseteq B'$.
 
-\subsubsection{Example unification}
-
-
-
-
+\input{res/unification_example.tex}
 
 
 \section{States}
