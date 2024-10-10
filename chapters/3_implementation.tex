@@ -48,7 +48,9 @@ The \texttt{Bound} class is a wrapper for a set of \texttt{NormalExpression} tha
 
 \subsection{Unifying two FunArrays}\label{sec:funarray:unifying}
 
-Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunArray segmentations \cite{cousot2011}. It is subjectively complicated to understand at first glance and needs to handle 11 different distinct sub-cases. It is a recursive algorithm that relies on the assumption that the left side of the array is already unified, but in one case that assumption is violated, making it hard to actually implement it recursively. When I implemented it, it was also prone to errors and hard to debug. Therefore I chose to implement the unifying of two segmentations in a different iterative algorithm. The authors also mentioned that they refined their algorithm in their actual implementation of the FunArray, mentioning a ``purification step'' that sounds similar to my approach, but don't go into more detail \cite[section 12.2]{cousot2011}. As their implementation is not freely available, one could only guess that they might have actually taken a similar approach as me in the end. My algorithm works as follows for two FunArrays $A$ and $B$ and their respective neutral elements $\nElement_A$ and $\nElement_B$:
+Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunArray segmentations \cite{cousot2011}. It is subjectively complicated to understand at first glance and needs to handle 11 different distinct sub-cases. It is a recursive algorithm that relies on the assumption that the left side of the array is already unified, but in one case that assumption is violated, making it hard to actually implement it recursively. When I implemented it, it was also prone to errors and hard to debug. Therefore I chose to implement the unifying of two segmentations in a different iterative algorithm. The authors also mentioned that they refined their algorithm in their actual implementation of the FunArray, mentioning a ``purification step'' that sounds similar to my approach, but don't go into more detail \cite[section 12.2]{cousot2011}. As their implementation is not freely available, one could only guess that they might have actually taken a similar approach as me in the end. 
+
+My algorithm works as follows for two FunArrays $A$ and $B$ and their respective neutral elements $\nElement_A$ and $\nElement_B$:
 \begin{enumerate}
   \item  Remove all expressions in the bounds of $A$ and $B$ that are only present in either of them but not both.
   \item \label{item:removeemptybounds} If that leaves empty bounds, such that there is no expression in them left, remove that bound and merge the adjacent segment values via the join operation. Set the might-be-empty flag for that new segment only if both its predecessors had it.
@@ -60,7 +62,9 @@ Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunA
   \item Finally remove all empty bounds in the resulting FunArrays, as described in Step~\ref{item:removeemptybounds}.
 \end{enumerate}
 
-\noindent\textcolor{red}{Frage @Gidon: sollte ich hier irgendwie beweisen, dass der Algorithmus ein korrektes Ergebnis liefert?}
+\noindent The two resulting FunArrays $A'$ and $B'$ have an identical segmentation, meaning their bounds are the same in the same order. The algorithm only ever introduces new segments with a value $\nElement\in\{\bot,\top\}$, that might be empty. When the value of that element is $\top$, the resulting Array $A'$ is an over-approximation of $A$. When that element is $\bot$, the resulting Array $A'$ is actually equal to $A$, as their are no concrete values, that are abstracted by $\bot$ and the segment therefore must be empty. We can therefore say that the resulting Arrays from this algorithm are over-approximations of their respective predecessors: $A\sqsubseteq A'$ and $B\sqsubseteq B'$.
+
+
 
 
 
