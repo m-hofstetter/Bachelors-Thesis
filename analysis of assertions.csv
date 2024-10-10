@@ -1,5 +1,0 @@
-﻿;standard_init1_ground_1;standard_init9_ground_1;standard_init7_ground_1;standard_init1_ground_2;standard_init9_ground_2;standard_init6_ground_2;standard_init2_ground_2;standard_init4_ground_2;standard_init5_ground_1;standard_init8_ground_2;array_ptr_single_elem_init_2;standard_copyInit_ground;condaf;ifncompf;standard_init8_ground_1;standard_init2_ground_1;standard_init7_ground_2;condg;standard_init3_ground_1;standard_init6_ground_1;standard_init3_ground_2;standard_init5_ground_2;condgf;standard_init4_ground_1
-Entire array initialised with single value. Assertion of alle elements equal to that value;x;x;x;x;x;x;x;x;x;x;;;;;x;x;x;x;x;x;x;x;x;x
-There is a segment at a given index h with value x. The variable v is assigned the value h. Then it is checked whether the value at a[v] = x;;;;;;;;;;;x;;;;;;;;;;;;;
-An array initialisied with a single value is completely copied, then check if the new array is filled with said value;;;;;;;;;;;;x;;;;;;;;;;;;
-Complex conditional logic;;;;;;;;;;;;;x;x;;;;;;;;;;
