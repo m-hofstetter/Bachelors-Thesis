@@ -1,0 +1,47 @@
+\chapter{Evaluation}
+\textcolor{red}{-- Forschungsfragen nochmal aufgreifen}
+
+To evaluate 
+
+\section{Experimental Setup}
+\subsection{Benchmarks}
+
+The International Competition on Software Verification (or SV-COMP)\footnote{More information about SV-COMP available at \url{https://sv-comp.sosy-lab.org/}} provides a set of benchmarks that can be used to compare tools for software verification\footnote{Available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. Their subcategory \textit{c/ReachSafety-Arrays} contains a collection of 433 verification tasks written in C for which the treatment of arrays is necessary to determine reachability. As such, this collection is suitable to test my implementation of the FunArray. They include at least one assertion per benchmark and its expected verdict for testing 
+The simple C programs have been translated to the embedded domain-specific language in Java using the tool Cuv\'ee \cite{ernst2020}. Since my implementation of the FunArray does not provide the entire functionality of the C language, about half of the benchmarks could not be translated. The 196 untranslatable benchmarks utilise features like the use of boolean variables, nested arrays, functions with a return value, structs and the use of the break keyword.
+
+\subsection{Formal Arguments of the FunArray}
+
+One of the FunArray's strengths is its ability to use different abstract domains for its bounds, array elements and variables without having to adapt the static analyser. For this evaluation the following abstract domains have been chosen as the FunArray functor's formal arguments: For abstracting variables and array elements the interval domain has been chosen, since it is relatively simple to implement. The chosen expression domain and therefore the abstract representation of segment bounds follows the scheme used by the FunArray's inventors \cite[section 7.2]{cousot2011}. Expressions are limited to the normal form $v+k$ where $v$ is a variable (whose value is abstracted by intervals) and $k$ is an integer constant.
+
+\section{Results}
+
+The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion can occur.
+
+\subsection{Invariants}
+Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a non-trivial invariant. A non-trivial invariant is defined as a state in which at least one of the arrays contains a segment whose value is not $\top$.
+This definition of non-triviality, however, does not take the FunArrays ability to depict multiple segments into account. If we were to treat all arrays as a single segment with a homogenous value across all elements, we could have gotten the same result and the same number of non-trivial invariants. We therefore narrow down the non-triviality criterion to those states containing at least one array with more than one segment and at least one segment with a value that is not $\top$. Now we arrive at 427 non-trivial invariants, which is still 45.0\%. 
+If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
+
+\subsection{Verifying assertions}
+
+My implementation is able to correctly identify the result of 24 out of the 247 assertions spread among 237 benchmarks or 9.7\% of assertions. When manually inspecting the program mechanism preceding these assertions in the benchmark, a single pattern can be identified that precedes the majority of them: Initialisation. The benchmark first initialises an array with a consistent value as its every element and immediately afterwards asserts that every element of the array has that specific value. Of the 24 correctly assessed assertions, 20 follow this pattern. The remaining four assertions follow a more complex program scheme, that involves conditions and loops.
+
+
+
+\section{Discussion}
+\subsection{Comparison with Cousot, Cousot and Logozzo's Results}
+
+Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by analysing the main libraries of the .NET framework and the implementation itself \cite{cousot2011}. The .NET libraries have been chosen for this since they contain a large amount of code and a vast selection of functionalities and techniques. They, however, lack an important aspect: The specification of expected properties. The authors are able to infer thousands of invariants but cannot determine whether they actually provide any useful information for the further execution of the code. To check against pre-specified properties they annotated their implementation of the FunArray with pre-conditions and proof obligations and ran it on itself. They were able to correctly assert 61 out of 1800 or 3.4\% of proof obligations when analysing the FunArray implementation using itself \cite{cousot2011}. This roughly matches my results of 9.7\%, considering the easy initialisation assertions make up a way greater amount of my test cases than would be present in a real world program.
+
+\subsection{Limitations}
+
+\subsubsection{Adjacent potentially empty segments}
+When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
+
+When trying to expand the first segment by inserting its value $x$ at index $b$, the resulting FunArray could either be \funArray{\bound{a} \fvalue{x} \bound{b\;c} \fvalue{x} \bound{b+1}? \fvalue{z} \bound{d}}, if the $y$-segment was empty, or alternatively \funArray{\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}}, if it was non-empty. Since the position of the \funArray{\bound{c}}-bound cannot by decided, it must be discarded altogether. After the insertion, $A$ becomes \funArray{A':\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1}? \fvalue{y\sqcup z} \bound{d}} and all information concerning the variable $c$ is lost.
+
+ Analyses of programs utilising segments in their arrays with adjacent and potentially empty segments have to discard non-trivial information. Thus the FunArray's approach for handling potentially empty adjacent segments limits the number of programs for which an analysis can achieve a non-trivial result.
+ 
+ Consider Algorithm \ref{algo:dijkstra}, Dijkstra's Dutch national flag algorithm, for example. Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained   
+ 
+\input{res/dijkstra_algorithm.tex}
