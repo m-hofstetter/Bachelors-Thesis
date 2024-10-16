@@ -43,6 +43,18 @@ I also partially implemented the Sign domain to make sure that my implementation
 
 
 
+
+\section{States}
+
+States are being defined via the \texttt{State} interface. They are implemented by the \texttt{UnreachableState} and the \texttt{ReachableState} class. Any operation on an \texttt{UnreachableState} representing $\bot$ will result in another \texttt{Unreachable\allowbreak State}. The \texttt{ReachableState} holds a map of \texttt{Refrence} and their variables current abstract value and another map of references to arrays in string form and their current abstract value in the form of \texttt{FunArray} instances. Apart from some utility methods, it provides functionality to set and get variable values and to set and get array element values. It also provides the \texttt{join} and \texttt{widen} functions, which basically delegate their function to the variable and array values and combine their results into a new state. 
+
+\input{res/uml_state.tex}
+
+
+
+
+
+
 \section{Arrays}
 
 The \texttt{FunArray} class provides a collection of bounds, element values and segment emptiness information. I decided against implementing the FunArray as a linked list and instead stored these values in Java collections as to make use of the Java stream API. The emptiness information is stored as boolean values (a segment can either be might-be-empty or non-empty). Array elements can take any implementation of the \texttt{DomainValue} (See section \ref{sec:scalarvariables}). Bounds are stored as \texttt{Bound} objects. The \texttt{FunArray} is immutable and when changed provides modified copies of itself.
@@ -122,12 +134,6 @@ Normalising a constant expression \texttt{k} is trivial, as its normal form is s
 The normalisation of the multiplication, division and modulo expressions is quite similar to the constant normalisation. As there es no general way to rearrange them into normal form, they can only be normalised, when their evaluation can be concretised into the constant part of the normal form. Of course there are certain refinements that could be done here, like rearranging multiplications into additions when a factor can be concretised. These opportunities have not been seized to keep the process of normalisation as simple as possible and as these refinements would probably only yield a marginal reward. 
 
 
-
-
-
-\section{States}
-
-States are being implemented defined via the \texttt{State} interface. They are implemented by the \texttt{UnreachableState} and the \texttt{ReachableState} class. Any operation on an \texttt{UnreachableState} representing $\bot$ will result in another \texttt{Unreachable\allowbreak State}. The \texttt{ReachableState} holds a map of \texttt{Refrence} and their variables current abstract value and another map of references to arrays in string form and their current abstract value in the form of \texttt{FunArray} instances. Apart from some utility methods, it provides functionality to set and get variable values and to set and get array element values. It also provides the \texttt{join} and \texttt{widen} functions, which basically delegate their function to the variable and array values and combine their results into a new state. 
 
 
 
