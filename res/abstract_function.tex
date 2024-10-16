@@ -1,0 +1,26 @@
+\begin{figure}[htb]
+	\begin{center}
+		\begin{tikzpicture}
+%            
+
+         \node [circle] (A)  at (0,0)    {A};
+  		 \node [circle] (B)  at (4,0)    {B};
+  		 \node [circle] (C)  at (0,2)    {A};
+  		 \node [circle] (D)  at (4,2)    {B};
+  		 
+  		 \draw [->] (A) -- (B); 
+  		 \draw [->] (C) -- (D); 
+  		 \draw [->] (A) to [bend left=30] node[left]{$\alpha$}  (C); 
+  		 \draw [->] (C) to [bend left=30] node[right]{$\gamma$} (A); 
+  		 \draw [->] (B) to [bend left=30] node[left]{$\alpha$} (D); 
+  		 \draw [->] (D) to [bend left=30] node[right]{$\gamma$} (B); 
+  		 
+  		 
+  		 \draw [->] (A) -- (B); 
+  		 \draw [->] (A) -- (B); 
+  		 \draw [->] (A) -- (B); 
+         
+        \end{tikzpicture}
+        \caption{Lorem Ipsum}.
+	\end{center}
+\end{figure}

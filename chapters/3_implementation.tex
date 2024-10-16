@@ -1,4 +1,9 @@
 \chapter{Implementation}
+
+I implemented a custom analyser for executing computer programs in the abstract in Java. It interprets an embedded domain specific language (EDSL) that supports integer variables, arithmetic expressions on integers, arrays, loops, simple conditions, if-else statements, assignments to variables and array elements, assertions and early returns. The EDSL is defined by the \texttt{BenchmarkProgram} interface, which is implemented by a chosen builder class that generates a \texttt{Statement} from an EDSL program. Figure \ref{fig:uml_analyser} showcases a simplified overview of the architecture of my analyser.
+
+\input{res/uml_analyser.tex}
+
 \section{Scalar Variables}\label{sec:scalarvariables}
 Cousot, Cousot and Logozzo's FunArray is embedded into Clousot, an already existing static code contract analyser for the .NET framework \cite{cousot2011}. It therefore profits from an already existing abstract analysis for scalar variables. My implementation however works in a rudimentary standalone analyser and implements its own abstract domains for scalar variables.
 They are defined by the interface \texttt{DomainValue} and support only a limited amount of arithmatic operations: Addition, subtraction, multiplication, division, modulo, negation and absolute value. Operations like exponentiation or bitwise xor etc. that are available in many programming languages like C or Java, have not been implemented, which limits the amount of programs that can be analysed with my implementation. 
@@ -24,6 +29,12 @@ $\underline{z}>\overline{z}$, instead an \texttt{Unreachable} is returned.
 \subsubsection{Abstraction and Concretisation Functions}
 The abstraction function defined in the \texttt{Domain} deviates from the mathematical definition as explained in section \ref{sec:abstractinterpretation:abstraction}. Instead of abstracting from a property (a set of integers), it abstracts from a single integer, since a concrete program only deals with integers but not with sets. The abstraction function is needed when evaluating an expression containing constants as described in section \ref{sec:expressions:evaluation}. It is implemented as $\alpha(z)=[z,z]$.
 The concretisation function $\gamma$ deviates in the same way and can only concretise intervals $\gamma([\underline{z},\overline{z}])=z$ where $z = \underline{z} = \overline{z}$. When $\underline{z} \neq \overline{z}$, the method throws a \texttt{ConcretisationException}. The concretisation function is needed for normalising expressions as described in section \ref{sec:expressions:normalisation} and the exception is being handled in that process. 
+
+\subsubsection{Restricting values}\label{sec:scalarvariables:intervals:restriction}
+
+Abstract values need to satisfy certain restrictions as explained in section \ref{sec:conditions}. Therefore the \texttt{DomainValue} interface defines the six satisfy methods , so abstract value can be restricted to be less than some other abstract value, less equal than, greater than, greater equal than, equal to and not equal to. Their implementation is mostly trivial, since their logic is already provided by the \texttt{meet} operation. The restrictions can be represented as an interval themselves. For example the restriction ``less equal than $[0,5]$'' is represented by $[-\infty,5]$ and the restriction ``greater than $0$'' is represented by $[1,\infty]$. When determining the restriction of an interval it is sufficient to take the intersection with that restriction representation. The exception to this the not equal restriction. Since it can't be represented via a single interval, this strategy only works in some edge cases (``not equal to $[0,5]$'' cannot be represented by a single interval, ``unequal to $[-\infty,0]$'' can be represented by $[1,\infty]$). How the unequal restriction is implemented can be seen in figure \ref{fig:unequal_restriction}.
+
+\input{res/unequal_restriction.tex}
 
 \subsection{Signs}
 I also partially implemented the Sign domain to make sure that my implementation of the FunArray works as intended with different abstractions of element values. The \texttt{Sign} class however does not implement all methods defined in the \texttt{DomainValue} interface and cannot be used in a full analysis of a program.
@@ -71,8 +82,6 @@ Cousot, Cousot and Logozzo developed a recursive algorithm for unifying two FunA
 \input{res/unification_example.tex}
 
 
-\section{States}
-
 
 
 
@@ -116,9 +125,19 @@ The normalisation of the multiplication, division and modulo expressions is quit
 
 
 
+\section{States}
+
+States are being implemented defined via the \texttt{State} interface. They are implemented by the \texttt{UnreachableState} and the \texttt{ReachableState} class. Any operation on an \texttt{UnreachableState} representing $\bot$ will result in another \texttt{Unreachable\allowbreak State}. The \texttt{ReachableState} holds a map of \texttt{Refrence} and their variables current abstract value and another map of references to arrays in string form and their current abstract value in the form of \texttt{FunArray} instances. Apart from some utility methods, it provides functionality to set and get variable values and to set and get array element values. It also provides the \texttt{join} and \texttt{widen} functions, which basically delegate their function to the variable and array values and combine their results into a new state. 
+
+
+
+
+
 
 \section{Assignments}
 
+Cousot, Cousot and Logozzo describe really well, what modifications need to take place to abstract the assignment operation for an array element and which caveats there are \cite[section 11.6]{cousot2011}. My implementation follows this strategy basically to the letter. The logic for this is located in the \texttt{FunArray} class. 
+Assignments to scalar variables are also described in their paper, but are not implemented as straight-forward. When assigning a value to a scalar variable \texttt{x := v} it does not suffice to simply change its value in the current \texttt{State}. Because we need to keep the stipulation that expressions inside array bounds are in order, we need to remove the expressions containing \texttt{x} from all array bounds. On the other hand we can also insert a new expression into bounds where it is known that its expressions evaluate to \texttt{v}. The logic for this is provided by the \texttt{Bound} class.
 
 
 
@@ -126,14 +145,56 @@ The normalisation of the multiplication, division and modulo expressions is quit
 
 \section{Conditionals}\label{sec:conditions}
 
-When defining the semantics of a real world programming language like C, we would normally not only need to assign semantics to arithmetic expressions like in the previous section, but also to boolean expressions \cite{scott1971}. As my analyser is not going to be used to analyse C programs or programs in any other real world programming language directly, I skipped this step. This means my analyser is only able to work with conditionals that are simple comparisons of arithmetic expressions. It is however possible to emulate boolean expressions by clever use of control structure. For example a conjunction is equivalent to a nested if-then-else statement and a negation is equivalent to the complement relation condition.
+When defining the semantics of a real world programming language like C, we would normally not only need to assign semantics to arithmetic expressions like in the previous section, but also to boolean expressions \cite{scott1971}. As my analyser is not going to be used to analyse C programs or programs in any other real world programming language directly, I skipped this step. This means my analyser is only able to work with conditionals that are simple comparisons of arithmetic expressions. It is however possible to emulate boolean expressions by clever use of control structure. For example a conjunction is equivalent to a nested if-then-else statement and a negation is equivalent to the complement relation condition. I implemented the following binary relations on arithmetic expressions as conditions: Equal $=$, not equal $\neq$, greater than $>$, greater equal than $\geq$, less than $<$ and less equal than $\leq$. Conditions are defined by the abstract \texttt{Condition} class. It holds an object extending the \texttt{Relation} abstract class, a left and a right \texttt{Expression}.
 
-When executing a program containing a conditional in the concrete, it is possible to determine whether the condition is satisfied or not and so, only one program branch has to be executed at a time. When interpreting it in the abstract, it is often not possible to determine this. Consider the condition \texttt{x~>=~0} for example. Under the abstract state $\rho=\{\mathtt{v}\mapsto[-1,1]\}$, this question is undecidable, as for some concrete values it true and for other it is false. The solution therefore is to execute both branches, assume the condition to be true and false respectively and in the end join the states of both branches.
+\subsection{Evaluating a condition}
 
-\noindent\textcolor{red}{TODO}
+There are three ways to evaluate whether a condition is satisfied, not satisfied or indeterminable. The following strategies are applied in a subsidiary manner in my implementation, meaning when one returns indeterminable, the next one is applied:
+
+\begin{enumerate}
+	\item Semantic comparison: The left and right expression each are being evaluated as in section \ref{sec:expressions:evaluation} and their abstract value compared. 
+	\item Comparison through bound order: The order of bounds in a FunArray implies an order of the expressions contained in that FunArray's bounds. Consider two expressions in normal form \texttt{e}$_1$ and \texttt{e}$_2$. If there exists a FunArray in the current state, where \texttt{e}$_1$ and \texttt{e}$_2$ are both part of the same bound, this means $\mathtt{e}_1=\mathtt{e}_2$. If there exists a FunArray $A=\ldots\{\mathtt{e}_1,\ldots\}[?]\ldots\{\mathtt{e}_2,\ldots\}[?]\ldots $, such that \texttt{e}$_2$ is present in a bound to the right of \texttt{e}$_1$, we know that $\mathtt{e}_1\leq\mathtt{e}_2$. If there exists at least one between \texttt{e}$_1$ and \texttt{e}$_2$ that is known to be non-empty, this inequality becomes strict $\mathtt{e}_1<\mathtt{e}_2$. If we want to compare two expressions that or not in normal form, we will first have to normalise them and compare each normal form of the first to the each normal form of the second.
+	\item Syntactic comparison: If two expressions in normal form $\mathtt{v}+k$ and $\mathtt{v}'+k'$ share the same variable $\mathtt{v}=\mathtt{v}'$, comparing these expressions is simply a matter of comparing their constants.
+\end{enumerate}
+
+\noindent This evaluation of a condition is done for assertions in the analysis. 
+
+\subsection{Satisfying a condition}
+When executing a program containing a conditional in the concrete, it is possible to determine whether the condition is satisfied or not and so, only one program branch has to be executed at a time. When interpreting it in the abstract, it is often not possible to determine this. Consider the condition $\mathtt{v}\geq0$ for example. Under the abstract state $\rho=\{\mathtt{v}\mapsto[-1,1]\}$, this question is undecidable, as for some concrete values it true and for other it is false. The solution therefore is to execute both branches, assume the condition to be true and false respectively and in the end join the states of both branches. The \texttt{Condition} class provides this functionality via the \texttt{satisfy} (and respectively the \texttt{satisfyComplement}) method. 
 
 
+A satisfying restriction $\rho'$ is an under-approximation $\rho'\sqsubseteq\rho$ of the current state $\rho$, such that a condition $\mathtt{e}\prec\mathtt{f}$ with $\prec \;\in \{=,\neq,<,\leq,>,\geq\}$ is met. Our goal when satisfying a condition is to find all satisfying restrictions and continue the analysis with their join. This is done the following way: First \texttt{f} is evaluated under the current state. Then all restrictions $\rho'$ such that $\llbracket\mathtt{e}\rrbracket\rho'\prec\llbracket\mathtt{f}\rrbracket\rho$ for \texttt{e} are determined. After that \texttt{e} is evaluated under the current state and all restrictions such that $\llbracket\mathtt{e}\rrbracket\rho\prec\llbracket\mathtt{f}\rrbracket\rho'$ for \texttt{f} are determined. The set of satisfying restrictions hereby differ for the different types of expressions.
 
+`
+\subsubsection{Satisfying restrictions of Atomic Expressions}
 
+A constant expression is, as the name suggests, constant. As such, its value cannot be changed and therefore its value not restricted. If a constant already satisfies a relation, the set of satisfying restrictions consists only of the current state. If it does not satisfy a relation, the set of satisfying restrictions is empty. The restriction of a variable or an array element expression works by replacing their value with a restricted value as described in section \ref{sec:scalarvariables:intervals:restriction}. 
+
+\subsubsection{Satisfying restrictions of Compound Expressions}
+
+The challenge in satisfying a compound expression lies therein, that there are multiple ways it can be satisfied. Consider the expression \texttt{e = a + b} with the current state $\rho=\{\mathtt{a}\mapsto[0,5],\mathtt{b}\mapsto[5,10]\}$. The expression \texttt{e} is now supposed to be restricted to be less equal to $[10,10]$. This could either work by restricting the value of \texttt{a} such that $\rho'(\mathtt{a})=[0,0]$ or by restricting \texttt{b} such that $\rho'(\mathtt{b})=[5,5]$.
+
+To have a look at a singular operand, we'll have to rearrange the equation. We evaluate all operands except the one under inspection and apply the inverse function with them to the comparand. The expression $\texttt{a + b} \leq [10,10]$ therefore becomes $\texttt{a} \leq [10,10] - \llbracket\texttt{e}\rrbracket\rho$. When \texttt{a} is an atomic expression, we can then figure out its satisfying restrictions as described in the previous section. If its a compound expression, we figure out its restrictions in a recursive manner. This is then done for all operands i.e. in this case \texttt{b}. This reverse restriction is only implemented non-trivially for addition and subtraction to limit my implementation efforts. 
+
+\input{res/restriction.tex}
 
 \section{Loops}
+
+The implementation of loops is somewhat trivial and follows the fixpoint approximation method \cite{cousot1977}. The \texttt{While} class holds statements in the form of a \texttt{Block} instance. They are repeatedly executed and their resulting state widened until a fixpoint is reached. Widening a state is simply a matter of widening the contained variables and then unifying the arrays and widening their elements segment wise. Since \texttt{While} represents a conditional loop, the conditional is satisfied before executing the contained statements and its complement is satisfied to the result of the fixpoint approximation since the condition is no longer true when exiting the loop.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

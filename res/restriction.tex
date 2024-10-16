@@ -1,0 +1,29 @@
+\begin{figure}[htb]
+	\begin{center}
+		\begin{tikzpicture}
+%            
+
+         \node [circle] (A)  at (0,0)    {$\texttt{a + b <= c - d}$};
+         
+         \node [circle] (B)  at (4,1)    {$\texttt{a + b}\leq\llbracket\texttt{c - d}\rrbracket$};
+         \node [circle] (C)  at (8,1.5)    {$\texttt{a}\leq\llbracket\texttt{c - d}\rrbracket - \llbracket\mathtt{b}\rrbracket$};
+         \node [circle] (D)  at (8,0.5)    {$\texttt{b}\leq\llbracket\texttt{c - d}\rrbracket - \llbracket\mathtt{a}\rrbracket$};
+         
+         \node [circle] (E)  at (4,-1)   {$\texttt{c - d}<\llbracket\texttt{a + b}\rrbracket$};
+		 \node [circle] (F)  at (8,-0.5)   {$\texttt{c}<\llbracket\texttt{a + b}\rrbracket + \llbracket\mathtt{d}\rrbracket$};
+		 \node [circle] (G)  at (8,-1.5)   {$\texttt{d}<\llbracket\texttt{a + b}\rrbracket - \llbracket\mathtt{c}\rrbracket$};
+  		 
+  		 
+  		 
+  		 \draw [->] (A) -- (B);
+  		 \draw [->] (A) -- (E);
+  		 
+  		 \draw [->] (B) -- (C);
+  		 \draw [->] (B) -- (D);
+  		 \draw [->] (E) -- (F);
+  		 \draw [->] (E) -- (G);
+         
+        \end{tikzpicture}
+        \caption{The satisfying restrictions of a condition $\texttt{a + b <= c - d}$.}.
+	\end{center}
+\end{figure}
