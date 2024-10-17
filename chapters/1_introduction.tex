@@ -1,9 +1,77 @@
 \chapter{Introduction}
 
 
-Verifikation ist wichtig
+%Verifikation ist wichtig
+%
+%Arrays sind schwierig
+%
+%Es gibt das von Cousot
 
-Arrays sind schwierig
 
-Es gibt das von Cousot
+Dividing any scalar value by zedro is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But when code becomes more complex, it is often times not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
 
+
+\begin{center}
+\begin{BVerbatim}
+class Scratch {
+  public static void main(String[] args) {
+    int result = 1 / 0;
+    System.out.println(result);
+  }
+}
+\end{BVerbatim}
+\end{center}
+
+\noindent To a human observer it is immediately obvious that this snippet contains a division by zero and will result in some undesired behaviour. When executing this code snippet, the JVM will output the following error message: \texttt{Exception in thread "main" java.lang.ArithmeticException: Division by zero}. But even when only writing this faulty piece of code, without having actually executed it, our IDE will issue a warning: \texttt{Division by zero}. The IDE has some functionality built in that detects any such division by zero. How is this being accomplished? One immediate guess to this would be the assumption that it syntactically verifies that the code does not contain the string \texttt{/0} anywhere. Let us modify our snippet to check this hypothesis:
+
+ \begin{center}
+\begin{BVerbatim}
+class Scratch {
+  public static void main(String[] args) {
+    int divisor = 458;
+    divisor = divisor + 17;
+    divisor = divisor - 475;
+    int result = 1 / divisor;
+    System.out.println(result);
+  }
+}
+\end{BVerbatim}
+\end{center}
+
+\noindent The code is now obfuscated in such a way that a human code reviewer might not notice the division by zero on first glance. Any syntactic analysis should also be impossible. However our IDE still issues a warning: \texttt{Division by zero}. This process of analysing code without actually reviewing it, is called static analysis. This term summarises a lot of different techniques, one of which is abstract interpretation.
+To put it very simple, when doing abstract interpretation, we are not running the program on concrete values, but rather on their properties. Let us take a look our example but this time with comments on what we can conclude by only taking the scalar variables sign property into account.  
+
+
+\lstset{
+    basicstyle=\ttfamily,
+    commentstyle=\color{gray},  % Set the color of comments
+    morecomment=[l]{//},        % Define "//" as the start of a comment
+}
+\vspace{2mm}
+
+\begin{adjustbox}{center}
+\begin{lstlisting}
+class Scratch {
+  public static void main(String[] args) {
+    int divisor = 458;
+    // divisor references a positive integer
+    divisor = divisor + 17;
+    // when adding to positive numbers the result
+    // will also be positive. the value of the 
+    // variable divisor must still be positive
+    divisor = divisor - 475;
+    // when subtracting from a positive number,
+    // the result might be negative or zero
+    // the variable divisor might potentially
+    // be zero
+    int result = 1 / divisor;
+    // since divisor might be zero, this division 
+    // might potentially throw an error!
+    System.out.println(result);
+  }
+}
+\end{lstlisting}
+\end{adjustbox}
+\vspace{2mm}
+
+\noindent Without having concretely calculated every step of the program, we have arrived at the conclusion that there may potentially be a division by zero. What we have done in natural language
