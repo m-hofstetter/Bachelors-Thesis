@@ -2,15 +2,15 @@
 \begin{center}
 \begin{tabular}{rcl}
 	
-program \texttt{p} & ::= & \texttt{A[e] := e}\\
+program \texttt{p} $\in\mathbb{P}$& ::= & \texttt{A[e] := e}\\
   &$|$&  \texttt{x := e}\\
   &$|$&  \texttt{p$_\mathtt{1}$; p$_\mathtt{2}$}\\
   &$|$&  \texttt{if b then p$_\mathtt{1}$ else p$_\mathtt{2}$}\\
   &$|$&  \texttt{while b then p}\\
   \\
-  boolean expression \texttt{b} & ::= & \texttt{e$_\mathtt{1}$<e$_\mathtt{2}$} $|$  \texttt{e$_\mathtt{1}$<=e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$>e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$>=e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$==e$_\mathtt{2}$}\\
+  boolean expression \texttt{b} $\in\mathbb{B}$ & ::= & \texttt{e$_\mathtt{1}$<e$_\mathtt{2}$} $|$  \texttt{e$_\mathtt{1}$<=e$_\mathtt{2}$} $|$ \texttt{!e} $|$ \texttt{e$_\mathtt{1}$==e$_\mathtt{2}$}\\
 	\\
-	arithmetic expression \texttt{e} & ::= & \texttt{z} $|$ \texttt{x} $|$ \texttt{A[e]} $|$ \texttt{e$_\mathtt{1}$+e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$-e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$*e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$/e$_\mathtt{2}$}\\
+	arithmetic expression \texttt{e} $\in\mathbb{E}$ & ::= & \texttt{z} $|$ \texttt{x} $|$ \texttt{A[e]} $|$ \texttt{e$_\mathtt{1}$+e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$-e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$*e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$/e$_\mathtt{2}$}\\
 
   \\
 	numeral \texttt{z}&$\in$&$\mathbb{Z}$\\
