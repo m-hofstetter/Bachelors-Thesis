@@ -1,0 +1,22 @@
+\begin{figure}[!htb]
+\begin{center}
+\begin{tabular}{rcl}
+	
+program \texttt{p} & ::= & \texttt{A[e] := e}\\
+  &$|$&  \texttt{x := e}\\
+  &$|$&  \texttt{p$_\mathtt{1}$; p$_\mathtt{2}$}\\
+  &$|$&  \texttt{if b then p$_\mathtt{1}$ else p$_\mathtt{2}$}\\
+  &$|$&  \texttt{while b then p}\\
+  \\
+  boolean expression \texttt{b} & ::= & \texttt{e$_\mathtt{1}$<e$_\mathtt{2}$} $|$  \texttt{e$_\mathtt{1}$<=e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$>e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$>=e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$==e$_\mathtt{2}$}\\
+	\\
+	arithmetic expression \texttt{e} & ::= & \texttt{z} $|$ \texttt{x} $|$ \texttt{A[e]} $|$ \texttt{e$_\mathtt{1}$+e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$-e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$*e$_\mathtt{2}$} $|$ \texttt{e$_\mathtt{1}$/e$_\mathtt{2}$}\\
+
+  \\
+	numeral \texttt{z}&$\in$&$\mathbb{Z}$\\
+	scalar variable name \texttt{x}&$\in$&$\mathbb{X}$\\
+	array variable name \texttt{A}&$\in$&$\mathbb{A}$\\
+\end{tabular}
+\end{center}
+\caption{The grammar for a simple example language in Backus--Naur form.}\label{fig:bnf_simplelanguage}
+\end{figure}
