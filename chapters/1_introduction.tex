@@ -13,7 +13,7 @@ Dividing any scalar value by zedro is undefined behaviour in most programming la
 
 \begin{center}
 \begin{BVerbatim}
-class Scratch {
+class Main {
   public static void main(String[] args) {
     int result = 1 / 0;
     System.out.println(result);
@@ -26,7 +26,7 @@ class Scratch {
 
  \begin{center}
 \begin{BVerbatim}
-class Scratch {
+class Main {
   public static void main(String[] args) {
     int divisor = 458;
     divisor = divisor + 17;
@@ -51,7 +51,7 @@ To put it very simple, when doing abstract interpretation, we are not running th
 
 \begin{adjustbox}{center}
 \begin{lstlisting}
-class Scratch {
+class Main {
   public static void main(String[] args) {
     int divisor = 458;
     // divisor references a positive integer
@@ -74,4 +74,78 @@ class Scratch {
 \end{adjustbox}
 \vspace{2mm}
 
-\noindent Without having concretely calculated every step of the program, we have arrived at the conclusion that there may potentially be a division by zero. What we have done in natural language
+\noindent Without having concretely calculated every step of the program, we have arrived at the conclusion that there may potentially be a division by zero. What we have done in natural language, can also be done in a formal way that is easily automated \cite{cousot1977} as long as only scalar variables are present. Now let us review an example that not only includes scalar variables but also arrays.
+
+
+\vspace{2mm}
+
+\begin{adjustbox}{center}
+\begin{lstlisting}
+class Main {
+  public static void main(String[] args) {
+    int[] array = new int[10];
+    for (int i = 10; i > 0; i--) {
+      array[i] = i;
+    }
+    for (int j : array) {
+      System.out.println(1 / j);
+    }
+  }
+}
+\end{lstlisting}
+\end{adjustbox}
+\vspace{2mm}
+
+
+\noindent Once again we would like to make sure that no division by zero occurs. On first sight it seems as if this was the case, but there is actually a off-by-one error hidden in the first loop and the array element at the first index will actually be a zero.
+How can we check for mistakes like these without executing the program? Of course we would be able to keep track of every property of every element on its own. However, this becomes problematic as soon as an array's length is being determined at runtime and when running it in the abstract, only certain properties are known about the length. The solution to this is the FunArray \cite{cousot2011}. It is a technique where an array is divided into symbolic segments and properties are being determined for these segments. Consider figure~\ref{fig:funarray}. It shows a graphical representation of a FunArray, that has two segments, which contain only positive and negative elements respectively. The shared bound in the middle is determined by the variable value of \texttt{i}, which itself is an abstract value. The length of the array and therefore the right bound of the second segment is also determined by an abstract value \texttt{l} and does not necessitate calculating the length in the concrete.
+
+\begin{figure}[t]
+\vspace{0.2cm}
+\begin{center}
+\begin{tikzpicture}
+	\draw (0,0) -- (4,0);
+    \draw (0,0.5) -- (4,0.5);
+
+    \draw (0,0) -- (0,0.5);
+    \draw (0,-0.25) node {\texttt{\string{0\string}}};
+
+    \draw (1,-0.05) node[anchor=south, yshift=0.5mm] {$+$};
+
+    \draw (2,0) -- (2,0.5);
+    \draw (2,-0.25) node {\texttt{\string{i\string}}};
+    
+    \draw (3,0) node[anchor=south] {$-$};
+    
+    \draw (4,0) -- (4,0.5);
+    \draw (4,-0.25) node {\texttt{\string{l\string}}};
+\end{tikzpicture}
+\end{center}
+\caption{A graphical representation of a FunArray.} \label{fig:funarray}
+
+\end{figure}
+
+The FunArray technique advances the field of abstract interpretation as it is an automatic way to semantically infer segments on arrays. It can easily be introduced to existing analyses without having any significant impact on execution time. It also does not require any additional effort by programmers as it is fully-automatic and it can be combined with any arbitrary abstract domain. In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
