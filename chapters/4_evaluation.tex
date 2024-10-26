@@ -1,7 +1,6 @@
 \chapter{Evaluation}
-\textcolor{red}{-- Forschungsfragen nochmal aufgreifen}
 
-To evaluate 
+To evaluate my implementation of the FunArray, we will experimentally test it. We want to determine its effectiveness in determining loop invariants, as well as in asserting given proof obligations.
 
 \section{Experimental Setup}
 \subsection{Benchmarks}
@@ -45,6 +44,11 @@ When trying to expand the first segment by inserting its value $x$ at index $b$,
  Consider Algorithm \ref{algo:dijkstra}, Dijkstra's Dutch national flag algorithm, for example. Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained   
  
 \subsection{Complex expressions in bounds}
+
+The FunArray can only hold expressions in normal form in its bound. When inserting a value at a more complex index expression, a normalisation of that expression might not be possible. As it cannot be inserted, the information about its order is lost, or worse, when the segment bounds are then empty, even more informations is lost, since adjacent segments will have to be joined. 
+
 \subsection{Sorted Arrays}
+
+There is no way to express in a FunArray that elements are in order. 
  
 \input{res/dijkstra_algorithm.tex}

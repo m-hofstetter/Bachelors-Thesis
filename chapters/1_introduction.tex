@@ -8,7 +8,7 @@
 %Es gibt das von Cousot
 
 
-Dividing any scalar value by zedro is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But when code becomes more complex, it is often times not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
+Dividing any scalar value by zero is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But when code becomes more complex, it is often times not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
 
 
 \begin{center}
@@ -22,7 +22,7 @@ class Main {
 \end{BVerbatim}
 \end{center}
 
-\noindent To a human observer it is immediately obvious that this snippet contains a division by zero and will result in some undesired behaviour. When executing this code snippet, the JVM will output the following error message: \texttt{Exception in thread "main" java.lang.ArithmeticException: Division by zero}. But even when only writing this faulty piece of code, without having actually executed it, our IDE will issue a warning: \texttt{Division by zero}. The IDE has some functionality built in that detects any such division by zero. How is this being accomplished? One immediate guess to this would be the assumption that it syntactically verifies that the code does not contain the string \texttt{/0} anywhere. Let us modify our snippet to check this hypothesis:
+\noindent To a human observer it is immediately obvious that this snippet contains a division by zero and will result in some undesired behaviour. When executing this code snippet, the JVM will output the following error message: \texttt{Exception in thread "main" java.lang.ArithmeticException: Division by zero}. But even when only writing this faulty piece of code, without having actually executed it, our IDE will issue a warning: \texttt{Division by zero}. Apparently our IDE has some functionality built in that detects any such division by zero. How is this being accomplished? One immediate guess to this would be the assumption that it syntactically verifies that the code does not contain the string \texttt{/0} anywhere. Let us modify our snippet to check this hypothesis:
 
  \begin{center}
 \begin{BVerbatim}
@@ -100,7 +100,7 @@ class Main {
 \noindent Once again we would like to make sure that no division by zero occurs. On first sight it seems as if this was the case, but there is actually a off-by-one error hidden in the first loop and the array element at the first index will actually be a zero.
 How can we check for mistakes like these without executing the program? Of course we would be able to keep track of every property of every element on its own. However, this becomes problematic as soon as an array's length is being determined at runtime and when running it in the abstract, only certain properties are known about the length. The solution to this is the FunArray \cite{cousot2011}. It is a technique where an array is divided into symbolic segments and properties are being determined for these segments. Consider figure~\ref{fig:funarray}. It shows a graphical representation of a FunArray, that has two segments, which contain only positive and negative elements respectively. The shared bound in the middle is determined by the variable value of \texttt{i}, which itself is an abstract value. The length of the array and therefore the right bound of the second segment is also determined by an abstract value \texttt{l} and does not necessitate calculating the length in the concrete.
 
-\begin{figure}[t]
+\begin{figure}[!htb]
 \vspace{0.2cm}
 \begin{center}
 \begin{tikzpicture}
@@ -125,9 +125,25 @@ How can we check for mistakes like these without executing the program? Of cours
 
 \end{figure}
 
-The FunArray technique advances the field of abstract interpretation as it is an automatic way to semantically infer segments on arrays. It can easily be introduced to existing analyses without having any significant impact on execution time. It also does not require any additional effort by programmers as it is fully-automatic and it can be combined with any arbitrary abstract domain. In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
+\noindent The FunArray technique advances the field of abstract interpretation as it is an automatic way to semantically infer segments on arrays. It can easily be introduced to existing analyses without having any significant impact on execution time. It also does not require any additional effort by programmers as it is fully-automatic and it can be combined with any arbitrary abstract domain. In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
 
 
+
+Goal: To implement the FunArray and evaluate it on practical benchmarks
+
+Was kann die Implementierung (Contribution)
+
+Referenzen zu einzelnen Kapiteln (Ich hab so und so viele Invarianten gefunden)
+
+Konkrete Zahlen direkt reinpacken
+
+
+Array Smashing ist deswegen schlechter, weil die Invarianten mehr als ein
+
+Zeigen dass man nicht-triviale Invarianten hat, aber 
+
+
+Vielleicht kann man Limitierung DNF umgehen indem man weniger joined und Fallunterscheidungen macht
 
 
 

@@ -35,7 +35,7 @@
 
 \newcommand\nElement{\mathrlap{\perp}\top}
 
-\title{\Huge{}Implementation and Evaluation of~the FunArray\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
+\title{\Huge{}Implementation and Evaluation of~the FunArray Abstract Domain\\[1em]\large{}Bachelor's Thesis\\[1em]Software and Computational Systems Lab\\Ludwig-Maximilians-Universit\"at M\"unchen}
 \date{October 2024}
 \author{Maximilian Hofstetter}
 
@@ -75,6 +75,10 @@ I would like to express my gratitude to my thesis advisor Gidon Ernst for extens
 
 \setcounter{tocdepth}{1}
 \tableofcontents
+
+\begin{abstract}
+  In this paper I will describe how implemented and examined an abstract static analyser utilising the FunArray abstract domain invented by Cosuot, Cousot and Logozzo. It is able to fully-automatically segment arrays and determine their content's properties. The analyser is able to work with any arbitrary scalar abstract domain, but to abstract variable values and array element values, I implemented the interval abstract domain. I will describe how I overhauled the unification algorithm for matching segment bounds of two FunArrays and how I implemented the normalisation of bound expressions. When evaluating this analyser against the SV-COMP benchmarks, it is able to determine non-trivial invariants for $61\%$ of all tested loops and proof $10\%$ of the included proof obligations.
+\end{abstract}
 
 \input{chapters/1_introduction.tex}
 \input{chapters/2_background.tex}
