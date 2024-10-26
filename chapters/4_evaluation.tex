@@ -58,10 +58,41 @@ Analyses of programs utilising segments in their arrays with adjacent and potent
  
 \subsubsection{Complex expressions in bounds}
 
-The FunArray can only hold expressions in normal form in its bound. When inserting a value at a more complex index expression, a normalisation of that expression might not be possible. As it cannot be inserted, the information about its order is lost, or worse, when the segment bounds are then empty, even more informations is lost, since adjacent segments will have to be joined. 
+The FunArray can only hold expressions in normal form in its bound. When inserting a value at a more complex index expression, a normalisation of that expression might not be possible. As it cannot be inserted, the information about its order is lost, or worse, when the segment bounds are then empty, even more informations is lost, since adjacent segments will have to be joined. To demonstrate this, let us have a look at an excerpt from the ``array\_doub\_access\_init\_\allowbreak{}const'' benchmark:
+
+
+\begin{adjustbox}{center}
+\begin{lstlisting}
+int N=100000;
+int a[2*N+2];
+
+for(i=0;i<=N;i++) {
+    a[2*i]=0;
+    a[2*i+1]=0;
+}
+\end{lstlisting}
+\end{adjustbox}
+\vspace{2mm}
+
+\noindent We would expect an analysis to determine that every element of \texttt{a} has the value \texttt{0} after executing this snippet. Unfortunately this is not the case. The analyser is not able to normalise the expressions \texttt{2*i} and \texttt{2*i+1} and therefore has to join all FunArray segments and thereby losing all information about the array.
+ 
+It might be hypothesised that shortcoming could be circumvented if the FunArray was able to hold arbitrary expressions in its bounds and not just those in a fixed normal form. Experimentally proving this was outside of the scope of this thesis and is left to future research.
+ 
 
 \subsubsection{Sorted Arrays}
 
-There is no way to express in a FunArray that elements are in order. 
+In the chosen benchmark selection there are some benchmarks in which an array is being sorted (e.g. ``sorting\_selectionsort\_ground\_1'', ``sorting\_bubblesort\_\allowbreak{}ground\_1'' etc.). Since my analyser does not employ relational values but is limited to intervals, it is not able assert whether an array is sorted or not. 
+ For Cousot, Cousot and Logozzo's FunArray the array element abstract domain is not only an abstraction of the element value (like in my implementation), but rather an abstraction of the cross product between an index and an array element value \cite{cousot2011}. It might be possible to construct an abstract domain that ensures that the value of an array element is increasing with its index. In my research I could not find any hints on whether this has been tried yet. I can therefore merely hypothesise that this approach might allow the FunArray to proof an array being ordered. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
 
