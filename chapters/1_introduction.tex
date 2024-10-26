@@ -125,9 +125,14 @@ How can we check for mistakes like these without executing the program? Of cours
 
 \end{figure}
 
-\noindent The FunArray technique advances the field of abstract interpretation as it is an automatic way to semantically infer segments on arrays. It can easily be introduced to existing analyses without having any significant impact on execution time. It also does not require any additional effort by programmers as it is fully-automatic and it can be combined with any arbitrary abstract domain. In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
+\noindent The FunArray technique advances the field of abstract interpretation as it is an automatic way to semantically infer segments on arrays. It can easily be introduced to existing analyses without having any significant impact on execution time. It also does not require any additional effort by programmers as it is fully-automatic and it can be combined with any arbitrary abstract domain. 
+%In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
 
 
+The Goal of this thesis is to implement a static analyser employing the techniques of abstract interpretation and especially the FunArray and to evaluate its performance. In chapter \ref{chap:background} I will more formally describe what abstract interpretation and the FunArray are and how they work. Chapter \ref{chap:implementation} contains a detailed description on how I implemented the analyser and the FunArray. I will show how I altered and simplified the unification algorithm from the original idea by Cosuot, Cousot and Logozzo. I will also explain how I implemented expression and their normalisation, which is needed because FunArray bounds can only handle expressions that have been brought into a special normal form. In chapter \ref{chap:evaluation} we will then evaluate this analyser against a selection of benchmarks from SV-COMP. I will show that the analyser is able to determine non-trivial invariants for $61\%$ of the contained loops and is able to assert $10\%$ of the included proof obligations.
+
+
+\color{red}
 
 Goal: To implement the FunArray and evaluate it on practical benchmarks
 
@@ -145,6 +150,7 @@ Zeigen dass man nicht-triviale Invarianten hat, aber
 
 Vielleicht kann man Limitierung DNF umgehen indem man weniger joined und Fallunterscheidungen macht
 
+\color{black}
 
 
 

@@ -1,4 +1,4 @@
-\chapter{Evaluation}
+\chapter{Evaluation}\label{chap:evaluation}
 
 To evaluate my implementation of the FunArray, we will experimentally test it. We want to determine its effectiveness in determining loop invariants, as well as in asserting given proof obligations.
 
@@ -16,7 +16,24 @@ One of the FunArray's strengths is its ability to use different abstract domains
 
 The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion can occur.
 
+\subsection{Definition of Triviality}
+
+We want to determine for how many of the benchmarks' loops the analyser is able to come up with an invariant. Since the analysis will always produce a result even if there is no meaningful information that can be extracted from it, we need to define triviality for these results. Consider an array \texttt{A} for example. The analysis is run on some some loop and determines the invariant for \texttt{A} to be \texttt{\string{0\string} [-$\infty$, $\infty$] \string{A.length\string}?}. This basically tells us that \texttt{A} contains integers whose value is entirely unknown on its entire length, or in other words: We know nothing at all about \texttt{A}. Therefore this invariant must be considered trivial. More generally, a state containing only arrays that themselves only contain segments of unknown value is certainly considered trivial.
+
+What we consider non-trivial is however not as clear. It might seem intuitive to consider every state that does not fit this description as such, however this leaves out an important aspect: The FunArray analyser is able to fully automatically divide an array into semantic segments. This differentiates the FunArray from a technique called array smashing \cite{cousot2011}. An analysis employing array smashing treats all array elements homogeneously. When changing a single element value, its abstract value is joined with all other elements and a lot of information is lost that way. To evaluate in which cases the FunArray analyser beats the array smashing, we must consider two different types of non-triviality:
+
+\begin{enumerate}
+	\item The general case, where at least one array in a state contains a segment without an unknown value.
+	\item The more narrow case where at least one array is two or more segments and one of these has a value that is not unknown.
+\end{enumerate}
+
+\noindent Of course it is not assured that we could have determined the same invariant via array smashing in the first case, but we certainly know that we could not have gotten the same result in the second case without the automatic segmentation.
+
+
+
+
 \subsection{Invariants}
+
 Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a non-trivial invariant. A non-trivial invariant is defined as a state in which at least one of the arrays contains a segment whose value is not $\top$.
 This definition of non-triviality, however, does not take the FunArrays ability to depict multiple segments into account. If we were to treat all arrays as a single segment with a homogenous value across all elements, we could have gotten the same result and the same number of non-trivial invariants. We therefore narrow down the non-triviality criterion to those states containing at least one array with more than one segment and at least one segment with a value that is not $\top$. Now we arrive at 427 non-trivial invariants, which is still 45.0\%. 
 If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
