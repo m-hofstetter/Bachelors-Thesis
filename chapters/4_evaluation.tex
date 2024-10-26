@@ -50,11 +50,39 @@ Cousot, Cousot and Logozzo evaluate their implementation of the FunArray by anal
 \subsubsection{Adjacent potentially empty segments}
 When expanding a segment by inserting a value adjacent to it, formerly adjacent and potentially empty segments will be joined with their nearest neighbour until a non-empty segment is reached. Let us consider the FunArray \funArray{A:\bound{a} \fvalue{x} \bound{b} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}} for example. It is unknown whether its second segment containing the value $y$ is empty or not and thus whether $b=c$ or $b<c$ is true.
 When trying to expand the first segment by inserting its value $x$ at index $b$, the resulting FunArray could either be \funArray{\bound{a} \fvalue{x} \bound{b\;c} \fvalue{x} \bound{b+1}? \fvalue{z} \bound{d}}, if the $y$-segment was empty, or alternatively \funArray{\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1} \fvalue{y} \bound{c}? \fvalue{z} \bound{d}}, if it was non-empty. Since the position of the \funArray{\bound{c}}-bound cannot by decided, it must be discarded altogether. After the insertion, $A$ becomes \funArray{A':\bound{a} \fvalue{x} \bound{b} \fvalue{x} \bound{b+1}? \fvalue{y\sqcup z} \bound{d}} and all information concerning the variable $c$ is lost.
-Analyses of programs utilising segments in their arrays with adjacent and potentially empty segments have to discard non-trivial information. Thus the FunArray's approach for handling potentially empty adjacent segments limits the number of programs for which an analysis can achieve a non-trivial result. Consider the following program in pseudo code, Dijkstra's Dutch national flag algorithm \cite{dijkstra1976}, for example:
+Analyses of programs utilising segments in their arrays with adjacent and potentially empty segments have to discard non-trivial information. Thus the FunArray's approach for handling potentially empty adjacent segments limits the number of programs for which an analysis can achieve a non-trivial result. Consider the following program, a C implementation of Dijkstra's Dutch national flag algorithm \cite{dijkstra1976}, for example. This example is not one of the benchmarks, but rather an algorithm that I tried to run while debugging and which turned out to not be analysable by my implementation in a meaningful way.
  
- \input{res/dijkstra_algorithm.tex}
+\vspace{2mm}
+\begin{adjustbox}{center}
+\begin{lstlisting}
+int A[] = {-1, 1, 0, 0, -1, -1, 1, 1, 0};
+int length = sizeof(A) / sizeof(A[0]);
+
+int r = 0;
+int w = length - 1;
+int b = length - 1;
+
+while (r <= w) {
+    if (A[w] <= -1) {
+        int temp = A[r];
+        A[r] = A[w];
+        A[w] = temp;
+        r++;
+    } else if (A[w] == 0) {
+        w--;
+    } else {
+        int temp = A[w];
+        A[w] = A[b];
+        A[b] = temp;
+        w--;
+        b--;
+    }
+}
+\end{lstlisting}
+\end{adjustbox}
+\vspace{2mm}
  
-\noindent Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained. It might very well be possible that this behaviour is circumventable by introducing split analysis for both cases. This experiment however, is outside of the scope of this thesis.
+\noindent Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained. It might very well be possible that this behaviour is circumventable by introducing separate analyses for both cases. This experiment however, is outside of the scope of this thesis.
  
 \subsubsection{Complex expressions in bounds}
 
