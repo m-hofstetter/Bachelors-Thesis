@@ -88,69 +88,28 @@ The process in an abstract interpretation is the same, with the difference being
 
 \section{The Interval Domain}
 
-Until this point we have been doing our abstract interpretation in the sign domain only. Let us introduce another, more precise one: The interval domain. This domain does not abstract the sign property of a scalar variable, but rather the property of which interval it is included in. An interval $[\underline{x},\overline{x}]$ has the concretisation $\gamma([\underline{x},\overline{x}])=\{z\in\mathbb{Z} \;|\; \underline{x}\leq z \leq \overline{x}\}$. Abstract expression operations follow usual interval arithmetics. For example, $[\underline{x},\overline{x}]+[\underline{y},\overline{y}]=[\underline{x}+\underline{y},\overline{x}+\overline{y}]$. Figure \ref{fig:domaincomparison} compares the sign domain to the interval domain and shows graphically how it abstracts in a more precise manner. Figure \ref{fig:intervaldomain} shows the interval lattice as a Hasse diagram.
-
 \input{res/domaincomparison.tex}
 
 \input{res/hasse_interval.tex}
 
-\section{Fixpoint Analysis}
+Until this point we have been doing our abstract interpretation in the sign domain only. Let us introduce another, more precise one: The interval domain. This domain does not abstract the sign property of a scalar variable, but rather the property of which interval it is included in. An interval $[\underline{x},\overline{x}]$ has the concretisation $\gamma([\underline{x},\overline{x}])=\{z\in\mathbb{Z} \;|\; \underline{x}\leq z \leq \overline{x}\}$. Abstract expression operations follow usual interval arithmetics. For example, $[\underline{x},\overline{x}]+[\underline{y},\overline{y}]=[\underline{x}+\underline{y},\overline{x}+\overline{y}]$. Figure \ref{fig:domaincomparison} compares the sign domain to the interval domain and shows graphically how it abstracts in a more precise manner. Figure \ref{fig:intervaldomain} shows the interval lattice as a Hasse diagram.
+
+
 
 \section{The FunArray}
 
 \subsection{Abstract Array Segmentation Predicates}
 
-A FunArray predicate takes the form $\{e_1^1\ldots e_{m^1}^1\} \,P_1\, \{e_1^2\ldots e_{m^2}^2\}[?^2]\,P_2\,\ldots\allowbreak\,P_{n-1}\,\allowbreak\{e_1^n\ldots e_{m^n}^n\}[?^n]$ \cite{cousot2011}, where $e_1^i\ldots e_{m^i}^i$
+\input{res/funarray_predicate.tex}
+
+A FunArray predicate takes the form \funArray{\bound{e_1^1\ldots e_{m^1}^1} \fvalue{P_1} \bound{e_1^2\ldots e_{m^2}^2}[?^2] \fvalue{P_2}\ldots\allowbreak\fvalue{P_{n-1}}\allowbreak \bound{e_1^n\ldots e_{m^n}^n}[?^n]}, where $e^i_1\ldots e^i_m\in\mathbb{E}$ are expressions in normal form determining segment bounds, $P_i\in A$ are abstract element values from a chosen abstract domain $A$ and the optional $[?_i]$ signifies whether a preceding segment might be possibly empty \cite{cousot2011}. The FunArray maintains the condition that $e_1^1=\ldots=e_{m^1}^1\leq e_1^2=\ldots=e_{m^2}^2\leq\ldots\leq e_1^n=\ldots=e_{m^n}^n$, meaning that expressions in the same bound evaluate to an equal value and that the bounds are ordered. 
 
 
-\vspace{0.2cm}
-\begin{figure}
-\begin{center}
-\begin{tikzpicture}
+Consider the following example: \funArray{A: \bound{0 \;\; a} \fvalue{[0,10]} \bound{a +4} \fvalue{[0,0]} \bound{b}?}. This means that the array $A$ has two segments. The first one which is bound by the expressions $0$ and $a$ on its left side and by $a+4$ on its right side. All array accesses with an index $i$ with $0=a\leq i \leq a+ 4$ will return the abstract value $[0,10]$. The second segment is bound by $a+4$ and $b$. It has the value $[0,0]$ and might possibly be empty as signified by the question mark.
 
-	\draw (0,0) -- (0,0.5);
-	\draw (0,0) -- node[above]{$P_1$} (2,0);
-	\draw (0,0.5) -- (2,0.5);
-	\node[below] at (0,0) {$\{e_1^1\ldots e_{m^1}^1\}$};
-	
-	\draw (2,0) -- (2,0.5);
-	\draw (2,0) -- node[above, xshift=0.5cm]{$P_2$} (3,0);
-	\draw (2,0.5) -- (3,0.5);
-	\node[below] at (2,0) {$\{e_1^2\ldots e_{m^2}^2\}$};
-	\draw[dashed] (3,0) -- (4,0);
-	\draw[dashed] (3,0.5) -- (4,0.5);
-	
-	
-	\draw[dashed] (5,0) -- (5.5,0);
-	\draw[dashed] (5,0.5) -- (5.5,0.5);
-	\draw (5.5,0) -- (5.5,0.5);
-	\draw (7.5,0) -- (7.5,0.5);
-	\draw (5.5,0) -- node[above]{$P_{n-1}$} (7.5,0);
-	\draw (5.5,0.5) -- (7.5,0.5);
-	
-	\node[below] at (7.5,0) {$\{e_1^n\ldots e_{m^n}^n\}$};
-	
-	
-	
-%	\draw (0,0) -- (4,0);
-%    \draw (0,0.5) -- (4,0.5);
-%
-%    \draw (0,0) -- (0,0.5);
-%    \draw (0,-0.25) node {\texttt{\string{0\string}}};
-%
-%    \draw (1,-0.05) node[anchor=south] {$[0,0]$};
-%
-%    \draw (2,0) -- (2,0.5);
-%    \draw (2,-0.25) node {\texttt{\string{i\string}}};
-%    
-%    \draw (3,0) node[anchor=south] {$\top$};
-%    
-%    \draw (4,0) -- (4,0.5);
-%    \draw (4,-0.25) node {\texttt{\string{n\string}}};
-\end{tikzpicture}
-\end{center}
-\caption{Graphical representation of a FunArray $\{e_1^1\ldots e_{m^1}^1\} \,P_1\,\allowbreak \{e_1^2\ldots\allowbreak e_{m^2}^2\}[?^2]\allowbreak\,P_2\,\ldots\,P_{n-1}\,\{e_1^n\ldots e_{m^n}^n\}[?^n]$.}
-\end{figure}
+
+
+
 
 
 
