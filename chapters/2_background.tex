@@ -108,6 +108,30 @@ A FunArray predicate takes the form \funArray{\bound{e_1^1\ldots e_{m^1}^1} \fva
 Consider the following example: \funArray{A: \bound{0 \;\; a} \fvalue{[0,10]} \bound{a +4} \fvalue{[0,0]} \bound{b}?}. This means that the array $A$ has two segments. The first one which is bound by the expressions $0$ and $a$ on its left side and by $a+4$ on its right side. All array accesses with an index $i$ with $0=a\leq i \leq a+ 4$ will return the abstract value $[0,10]$. The second segment is bound by $a+4$ and $b$. It has the value $[0,0]$ and might possibly be empty as signified by the question mark.
 
 
+\subsection{Functors}
+
+An abstract domain functor is a function from the parameter domains $D_1,\ldots,D_n$ to a new abstract domain $D(D_1,\ldots,D_n)$ \cite{cousot2011}.
+Since the FunArray is a functor $S(B(E),A,R)$, it can be adapted to a wide range of analyses by tweaking its parameter domains. It takes the following domains as arguments:
+\begin{itemize}[label={--}]
+	\item The segment bound $B(E)$, which in turn is also a functor from the expression domain $E$.
+	\item The array element abstract domain $A$. This is an arbitrary abstraction on the examined values. In the remaining examples in this thesis, this is going to be the interval domain.
+	\item The variable abstract domain $R$.
+\end{itemize} 
+
+\subsection{Abstract operations}
+
+As an abstract domain, the FunArray supports the abstract operations join $\sqcup$, meet $\sqcap$, partial order $\sqsubseteq$, widen $\triangledown$ and narrow $\vartriangle$. To apply these, the segment bounds of the triangle need to be unified and the respective operation applied segment wise. Unification is a process whereby the FunArrays $A$ and $B$ are modified into $A'$ and $B'$, such that $A\sqsubseteq A'$ and $B\sqsubseteq B'$ and the segment bounds for $A'$ and $B'$ are identical.
+
+
+\subsection{Transformers}
+
+An array access \texttt{A[e]} in the FunArray domain is not as trivial as in a concrete execution of a program. Because \texttt{e} might not actually be present in the bounds of the FunArray, we need to find the greatest bound $B_l\leq \llbracket \texttt{e}\rrbracket$ and the least bound $B_g\geq \llbracket \texttt{e}\rrbracket$ in a given array. The evaluation of the array access is then $\llbracket\texttt{A[e]}\rrbracket=\bigsqcup^{g-1}_{k=l}P_k$.
+
+An array is modified by the array assignment \texttt{A[i] = e}. Its semantics is defined as follows: $\llbracket\texttt{A[i] = e}\rrbracket\rho=\rho[A:=A']$, meaning the array $A: B_1P_1B_2[?_1]\ldots P_{n-1}\allowbreak{}B_n[?_{n-1}]$ has been replaced by the modified $A': B_1P_1B_2[?_1]\ldots\allowbreak B_l[?_l] (\bigsqcup^{g-1}_{k=l}P_k)\allowbreak\, \{\,\llbracket\texttt{i}\rrbracket\,\}?\, \llbracket\texttt{e}\rrbracket \allowbreak\,\{\,\llbracket\texttt{i}\rrbracket+1\,\}\, \allowbreak(\bigsqcup^{g-1}_{k=l}P_k) B_g?\ldots \allowbreak P_{n-1}B_n[?_{n-1}]$, whereby $B_l\leq\llbracket\texttt{i}\rrbracket\leq B_g$.
+
+When modifying variables in the state, the FunArray predicates also need to be modified as they might contain that variable. consider an array \funArray{A: \bound{a} \fvalue{P_1} \bound{b} \fvalue{P_2} \bound{c}}. If there is an assignment \texttt{b := b+1}, the FunArray needs to be modified to \funArray{A': \bound{a} \fvalue{P_1} \bound{b-1} \fvalue{P_2} \bound{c}}, so that it is still correct. 
+
+
 
 
 
