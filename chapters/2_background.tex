@@ -86,6 +86,11 @@ Our simple language not only contains expressions, but also commands or statemen
 More generally the semantics of an assignment is defined as $\llbracket \texttt{i\;:=\;e} \rrbracket\rho=\rho[\mathtt{i}:=\texttt{e}]$ with $\rho[\mathtt{i}:=\texttt{e}](\mathtt{i})=\llbracket\mathtt{e}\rrbracket\rho$ \cite{cousot2011}. Commands that alter the environment are called transformations. They are basically functions in $\mathcal{R}_v\mapsto\mathcal{R}_v$ \cite{scott1971}.
 The process in an abstract interpretation is the same, with the difference being of course, that expressions are being evaluated in the abstract domain.
 
+\section{Conditionals}
+\textcolor{red}{TODO}
+\section{Fixpoint Analysis}
+\textcolor{red}{TODO}
+
 \section{The Interval Domain}
 
 \input{res/domaincomparison.tex}
@@ -93,12 +98,6 @@ The process in an abstract interpretation is the same, with the difference being
 \input{res/hasse_interval.tex}
 
 Until this point we have been doing our abstract interpretation in the sign domain only. Let us introduce another, more precise one: The interval domain. This domain does not abstract the sign property of a scalar variable, but rather the property of which interval it is included in. An interval $[\underline{x},\overline{x}]$ has the concretisation $\gamma([\underline{x},\overline{x}])=\{z\in\mathbb{Z} \;|\; \underline{x}\leq z \leq \overline{x}\}$. Abstract expression operations follow usual interval arithmetics. For example, $[\underline{x},\overline{x}]+[\underline{y},\overline{y}]=[\underline{x}+\underline{y},\overline{x}+\overline{y}]$. Figure \ref{fig:domaincomparison} compares the sign domain to the interval domain and shows graphically how it abstracts in a more precise manner. Figure \ref{fig:intervaldomain} shows the interval lattice as a Hasse diagram.
-
-
-\section{Conditionals}
-\textcolor{red}{TODO}
-\section{Fixpoint Analysis}
-\textcolor{red}{TODO}
 
 \section{The FunArray}
 

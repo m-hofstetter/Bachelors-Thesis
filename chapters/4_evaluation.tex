@@ -32,7 +32,7 @@ What we consider non-trivial is however not as clear. It might seem intuitive to
 
 \subsection{Invariants}
 
-Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a general non-trivial invariant. When examining the more narrow requirements for non-triviality, we arrive at 427 invariants, which is still 45.0\% of the total. If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
+Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a general non-trivial invariant. When examining the more narrow requirements for non-triviality, we arrive at 427 invariants, which is still 45.0\% of the total, meaning via the FunArray is able to generate at least four times as many non-trivial invariants as the array smashing technique. If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
 
 \subsection{Verifying assertions}
 
