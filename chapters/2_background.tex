@@ -87,7 +87,25 @@ More generally the semantics of an assignment is defined as $\llbracket \texttt{
 The process in an abstract interpretation is the same, with the difference being of course, that expressions are being evaluated in the abstract domain.
 
 \section{Conditionals}
-\textcolor{red}{TODO}
+
+The concrete semantics for conditionals is relatively obvious. Consider the statement $\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}$. We test whether the variable $\texttt{v}_\texttt{1}$ is less equal than $\texttt{v}_\texttt{2}$ and if that is the case we execute the program branch $\texttt{p}_\texttt{1}$ and $\texttt{p}_\texttt{2}$ otherwise. The semantics for this are defined as follows \cite{scott1971}: 
+
+\begin{center}
+	$\llbracket\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}\rrbracket\rho = 
+	\begin{cases}
+		\llbracket\texttt{p}_\texttt{1}\rrbracket\rho, & \textrm{if } \llbracket\texttt{v}_\texttt{1}\rrbracket\rho \leq \llbracket\texttt{v}_\texttt{2}\rrbracket\rho\\
+		\llbracket\texttt{p}_\texttt{2}\rrbracket\rho, & \textrm{else}
+	\end{cases}$
+\end{center} 
+\vspace{2mm}
+\noindent The semantics in an abstract analyses work slightly different. Since $\texttt{v}_\texttt{1}$ and $\texttt{v}_\texttt{2}$ do not have concrete values, but are being abstracted by abstract values that might contain more than one value, we cannot always decide whether the condition is true or not. Instead we will have to calculate both branches and need to restrict the variable values in such a way that the condition is definitely true and definitely false respectively. The semantics in the abstract are as follows:
+
+\begin{center}
+	$\llbracket\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}\rrbracket\rho = \llbracket\texttt{p}_\texttt{1}\rrbracket\rho^{t\!t} \sqcup\llbracket\texttt{p}_\texttt{2}\rrbracket\rho^{f\!\!f}$,
+\end{center} 
+
+\noindent whereby $\rho^{t\!t}=\rho[v_1:=v_1'][v_2:=v_2']$ is such that $v_1'\sqsubseteq v_1$ and $v_2'\sqsubseteq v_2$ and $v_1'\leq v_2'$. Analogous for $\rho^{f\!\!f}$. How  $v_1'$ and $v_2'$ are determined depends on the used abstract domain.
+
 \section{Fixpoint Analysis}
 \textcolor{red}{TODO}
 
