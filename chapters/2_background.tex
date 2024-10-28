@@ -107,7 +107,82 @@ The concrete semantics for conditionals is relatively obvious. Consider the stat
 \noindent whereby $\rho^{t\!t}=\rho[v_1:=v_1'][v_2:=v_2']$ is such that $v_1'\sqsubseteq v_1$ and $v_2'\sqsubseteq v_2$ and $v_1'\leq v_2'$. Analogous for $\rho^{f\!\!f}$. How  $v_1'$ and $v_2'$ are determined depends on the used abstract domain.
 
 \section{Fixpoint Analysis}
-\textcolor{red}{TODO}
+
+The semantics for loops in the concrete are defined recursively like follows \cite{scott1971}:
+
+\begin{center}
+	$\llbracket\texttt{while b do p}\rrbracket = 
+	\begin{cases}
+		\llbracket\texttt{p}\rrbracket \circ \llbracket\texttt{while b do p}\rrbracket, & \textrm{if } \llbracket\texttt{b}\rrbracket=\textrm{tt}\\
+		\textrm{empty program}, & \textrm{else}
+	\end{cases}$
+\end{center} 
+\vspace{2mm}
+
+\noindent Once again we face the problem in abstract interpretation whether and when the condition \texttt{b} is satisfied. Instead we will relay on a technique called fixpoint analysis. Basically we satisfy the condition \texttt{b} and then apply the command \texttt{p} until we reach a fixpoint, meaning the the state $\rho$ does not change anymore when applying \texttt{p} \cite{cousot1977}. Let us regard the application of the program \texttt{p} as a function $f: \mathcal{R}_v\mapsto \mathcal{R}_v$. Now $\rho^0$ describes the variable environment before entering the loop, $\rho^n=f(\rho^{n-1})$ describes the environment after executing \texttt{p} $n$ times. When repeatedly executing $f$, we obtain a sequence that follows one of the three following patterns:
+
+\begin{enumerate}
+	\item A continuous sequence, where we reach a state that has not been obtained before after each loop pass.\\
+\begin{center}
+	\begin{tikzpicture}
+	\node (A) at (0,0) {$\rho^0$};
+	\node (B) at (1,0) {$\rho^1$};
+	\node (C) at (2,0) {$\rho^2$};
+	\node (D) at (3,0) {$\rho^3$};
+	\node (E) at (4,0) {$\ldots$};
+	
+	
+	\draw[->] (A) -- node[above]{$f$} (B);
+	\draw[->] (B) -- node[above]{$f$} (C);
+	\draw[->] (C) -- node[above]{$f$} (D);
+	\draw[->] (D) -- node[above]{$f$} (E);
+\end{tikzpicture}
+\end{center}
+
+	\item \parbox[t]{\linewidth}{A sequence that ends in a cycle, meaning the sequence will repeat multiple states for ever.\\
+\begin{center}
+	\begin{tikzpicture}
+	\node (A) at (0,0) {$\rho^0$};
+	\node (B) at (1,0) {$\rho^1$};
+	\node (C) at (2,0) {$\rho^2$};
+	\node (D) at (3,0) {$\ldots$};
+	\node (E) at (4,0) {$\rho^n$};
+	\node (F) at (5,0) {$\ldots$};
+	\node (G) at (6,0) {$\rho^n$};
+	
+	
+	\draw[->] (A) -- node[above]{$f$} (B);
+	\draw[->] (B) -- node[above]{$f$} (C);
+	\draw[->] (C) -- node[above]{$f$} (D);
+	\draw[->] (D) -- node[above]{$f$} (E);
+	\draw[->] (E) -- node[above]{$f$} (F);
+	\draw[->] (F) -- node[above]{$f$} (G);
+	
+	\draw[->] (G) edge [in=-90, out=-90,looseness=1] node[above]{$f$} (E);
+\end{tikzpicture}
+\end{center}
+}
+	\item A sequence that ends in a fixpoint $\rho^n$, such that $f(\rho^n)=\rho^n$.\\
+\begin{center}
+\begin{tikzpicture}
+	\node (A) at (0,0) {$\rho^0$};
+	\node (B) at (1,0) {$\rho^1$};
+	\node (C) at (2,0) {$\rho^2$};
+	\node (D) at (3,0) {$\ldots$};
+	\node (E) at (4,0) {$\rho^n$};
+	
+	
+	\draw[->] (A) -- node[above]{$f$} (B);
+	\draw[->] (B) -- node[above]{$f$} (C);
+	\draw[->] (C) -- node[above]{$f$} (D);
+	\draw[->] (D) -- node[above]{$f$} (E);
+	
+	\draw[->] (E) edge [in=-30, out=30,looseness=6] node[right]{$f$} (E);
+\end{tikzpicture}
+\end{center}
+\end{enumerate} 
+
+\noindent Since we rely on the sequence to end in a fixpoint, so that we can end our abstract loop, we need to eliminate cases 1 and 2. For this we apply the widening operator $\triangledown$ after every loop pass. This operator is a function $\triangledown: \mathcal{R}_v\mapsto \mathcal{R}_v$, such that $f(\rho)\sqsubseteq\rho\triangledown f(\rho)$ and every infinite sequence $\rho^0,\rho^1,\dots$, where $\rho^n=\rho^{n-1}\triangledown f(\rho^{-1})$ is not strictly increasing \cite{cousot1977}. The exact definition of this widening operator depends on the used abstract domain.
 
 \section{The Interval Domain}
 
