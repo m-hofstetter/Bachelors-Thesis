@@ -5,7 +5,7 @@ To evaluate my implementation of the FunArray, we will experimentally test it. W
 \section{Experimental Setup}
 \subsection{Benchmarks}
 
-The International Competition on Software Verification (or SV-COMP)\footnote{More information about SV-COMP available at \url{https://sv-comp.sosy-lab.org/}} provides a set of benchmarks that can be used to compare tools for software verification\footnote{Available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. Their subcategory \textit{c/ReachSafety-Arrays} contains a collection of 433 verification tasks written in C for which the treatment of arrays is necessary to determine reachability. As such, this collection is suitable to test my implementation of the FunArray. They include at least one assertion per benchmark and its expected verdict for testing 
+The International Competition on Software Verification (or SV-COMP)\footnote{More information about SV-COMP available at \url{https://sv-comp.sosy-lab.org/}} provides a set of benchmarks that can be used to compare tools for software verification\footnote{Available at \url{https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks}}. Their subcategory ``c/ReachSafety-Arrays'' contains a collection of 433 verification tasks written in C for which the treatment of arrays is necessary to determine reachability. As such, this collection is suitable to test my implementation of the FunArray. They include at least one assertion per benchmark and its expected verdict for testing.
 The simple C programs have been translated to the embedded domain-specific language in Java using the tool Cuv\'ee \cite{ernst2020}. Since my implementation of the FunArray does not provide the entire functionality of the C language, about half of the benchmarks could not be translated. The 196 untranslatable benchmarks utilise features like the use of boolean variables, nested arrays, functions with a return value, structs and the use of the break keyword.
 
 \subsection{Formal Arguments of the FunArray}
@@ -14,11 +14,11 @@ One of the FunArray's strengths is its ability to use different abstract domains
 
 \section{Results}
 
-The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion can occur.
+The execution time of the benchmarks is almost negligible. To execute all 237 benchmarks it takes 253 milliseconds (Averaged value over 100 runs. The workbench used is a M2 Max MacBook Pro running OpenJDK 22). This comes down to about a millisecond per benchmark. This result was expected, since the FunArray does not handle disjunctions separately but through the use of empty segments. No combinatorial explosion is expected to occur.
 
 \subsection{Definition of Triviality}
 
-We want to determine for how many of the benchmarks' loops the analyser is able to come up with an invariant. Since the analysis will always produce a result even if there is no meaningful information that can be extracted from it, we need to define triviality for these results. Consider an array $A$ for example. The analysis is run on some some loop and determines the invariant for $A$ to be \funArray{A:\bound{a} \fvalue{[-\infty,\infty]} \bound{a}?}. This basically tells us that $A$ contains integers whose value is entirely unknown on its entire length, or in other words: We know nothing at all about \texttt{A}. Therefore this invariant must be considered trivial. More generally, a state containing only arrays that themselves only contain segments of unknown value is certainly considered trivial.
+We want to determine for how many of the benchmarks' loops the analyser is able to come up with an invariant. Since the analysis will always produce a result even if there is no meaningful information that can be extracted from it, we need to define triviality for these results. Consider an array $A$ for example. The analysis is run on some some loop and determines the invariant for $A$ to be \funArray{A:\bound{a} \fvalue{[-\infty,\infty]} \bound{a.length}?}. This basically tells us that $A$ contains integers whose value is entirely unknown on its entire length, or in other words: We know nothing at all about \texttt{A}. Therefore this invariant must be considered trivial. More generally, a state containing only arrays that themselves only contain segments of unknown value is certainly considered trivial.
 
 What we consider non-trivial is however not as clear. It might seem intuitive to consider every state that does not fit this description as such, however this leaves out an important aspect: The FunArray analyser is able to fully automatically divide an array into semantic segments. This differentiates the FunArray from a technique called array smashing \cite{cousot2011}. An analysis employing array smashing treats all array elements homogeneously. When changing a single element value, its abstract value is joined with all other elements and a lot of information is lost that way. To evaluate in which cases the FunArray analyser beats the array smashing, we must consider two different types of non-triviality:
 
@@ -27,16 +27,16 @@ What we consider non-trivial is however not as clear. It might seem intuitive to
 	\item The more narrow case where at least one array is two or more segments long and at least one of these segments has a value more specific than $\top$.
 \end{enumerate}
 
-\noindent Of course it is not assured that we could have determined the same invariant via array smashing in the first case, but we certainly know that we could not have gotten the same result in the second case without the automatic segmentation.
+\noindent Of course it is not assured that we could have determined the same invariant via array smashing in the first case, but we certainly know that we could not have gotten the same result in the second case without the automatic semantic segmentation.
 
 
 \subsection{Invariants}
 
-Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a general non-trivial invariant. When examining the more narrow requirements for non-triviality, we arrive at 427 invariants, which is still 45.0\% of the total, meaning via the FunArray is able to generate at least four times as many non-trivial invariants as the array smashing technique. If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
+Spread across the 238 benchmarks there are 947 loops. For 580 or 61.3\% of those my implementation of the FunArray was able to determine a general non-trivial invariant. When examining the more narrow requirements for non-triviality, we arrive at 427 invariants, which is still 45.0\% of the total, meaning the FunArray is able to generate at least four times as many non-trivial invariants as the array smashing technique. If we were to increase the required number of segments to more than two, this number would drop down to 3, suggesting the FunArrays ability to depict a lot of segments cannot be utilised in actual code analyses. No calculated invariants had more than three segments.
 
 \subsection{Verifying assertions}
 
-My implementation is able to correctly identify the result of 24 out of the 247 assertions spread among 237 benchmarks or 9.7\% of assertions. When manually inspecting the program mechanism preceding these assertions in the benchmark, a single pattern can be identified that precedes the majority of them: Initialisation. The benchmark first initialises an array with a consistent value as its every element and immediately afterwards asserts that every element of the array has that specific value. Of the 24 correctly assessed assertions, 20 follow this pattern. The remaining four assertions follow a more complex program scheme, that involves conditions and loops.
+My implementation is able to correctly identify the result of 24 out of the 247 assertions spread among 237 benchmarks or 9.7\% of assertions. It did not contradict any proof obligations. When manually inspecting the program mechanism preceding these assertions in the benchmark, a single pattern can be identified that precedes the majority of them: Initialisation. The benchmark first initialises an array with a consistent value as its every element and immediately afterwards asserts that every element of the array has that specific value. Of the 24 correctly assessed assertions, 20 follow this pattern. The remaining four assertions follow a more complex program scheme, that involves conditions and loops. This suggests that one of the strengths of the FunArray is to recognise correct initialisation of arrays.
 
 
 
@@ -53,8 +53,8 @@ When trying to expand the first segment by inserting its value $x$ at index $b$,
 Analyses of programs utilising segments in their arrays with adjacent and potentially empty segments have to discard non-trivial information. Thus the FunArray's approach for handling potentially empty adjacent segments limits the number of programs for which an analysis can achieve a non-trivial result. Consider the following program, a C implementation of Dijkstra's Dutch national flag algorithm \cite{dijkstra1976}, for example. This example is not one of the benchmarks, but rather an algorithm that I tried to run while debugging and which turned out to not be analysable by my implementation in a meaningful way.
  
 \vspace{2mm}
-\begin{adjustbox}{center}
-\begin{lstlisting}
+\begin{center}
+\begin{BVerbatim}
 int A[] = {-1, 1, 0, 0, -1, -1, 1, 1, 0};
 int length = sizeof(A) / sizeof(A[0]);
 
@@ -78,9 +78,8 @@ while (r <= w) {
         b--;
     }
 }
-\end{lstlisting}
-\end{adjustbox}
-\vspace{2mm}
+\end{BVerbatim}
+\end{center}
  
 \noindent Even though the analysis correctly determines the Array to be described as $\bound{0} \fvalue{[-\infty, -1]} \bound{r}? \fvalue{\top} \bound{w}? \fvalue{[0, 0]} \bound{b}? \fvalue{[1, \infty]}  \bound{|A|}?$ after a single loop pass, it loses all its information in the second pass, because the determined segments are all potentially empty and extending their neighbours discards them altogether. After the second loop pass the analysis yields $\bound{0} \fvalue{\top} \bound{|A|}$. Basically no information can be gained. It might very well be possible that this behaviour is circumventable by introducing separate analyses for both cases. This experiment however, is outside of the scope of this thesis.
  
@@ -103,14 +102,13 @@ for(i=0;i<=N;i++) {
 \vspace{2mm}
 
 \noindent We would expect an analysis to determine that every element of \texttt{a} has the value \texttt{0} after executing this snippet. Unfortunately this is not the case. The analyser is not able to normalise the expressions \texttt{2*i} and \texttt{2*i+1} and therefore has to join all FunArray segments and thereby losing all information about the array.
- 
-It might be hypothesised that shortcoming could be circumvented if the FunArray was able to hold arbitrary expressions in its bounds and not just those in a fixed normal form. Experimentally proving this was outside of the scope of this thesis and is left to future research.
+ It might be hypothesised that shortcoming could be circumvented if the FunArray was able to hold arbitrary expressions in its bounds and not just those in a fixed normal form. Experimentally proving this was outside of the scope of this thesis and is left to future research.
  
 
 \subsubsection{Sorted Arrays}
 
 In the chosen benchmark selection there are some benchmarks in which an array is being sorted (e.g. ``sorting\_selectionsort\_ground\_1'', ``sorting\_bubblesort\_\allowbreak{}ground\_1'' etc.). Since my analyser does not employ relational values but is limited to intervals, it is not able assert whether an array is sorted or not. 
- For Cousot, Cousot and Logozzo's FunArray the array element abstract domain is not only an abstraction of the element value (like in my implementation), but rather an abstraction of the cross product between an index and an array element value \cite{cousot2011}. It might be possible to construct an abstract domain that ensures that the value of an array element is increasing with its index. In my research I could not find any hints on whether this has been tried yet. I can therefore merely hypothesise that this approach might allow the FunArray to proof an array being ordered. 
+ For Cousot, Cousot and Logozzo's FunArray the array element abstract domain is not only an abstraction of the element value (like in my implementation), but rather an abstraction of the cross product between an index and an array element value \cite{cousot2011}. It might be possible to construct an abstract domain that ensures that the value of an array element is increasing with its index. In my research I could not find any hints on whether this has been tried yet. I can therefore merely hypothesise that this approach might allow the FunArray to proof an array being sorted. 
  
  
  

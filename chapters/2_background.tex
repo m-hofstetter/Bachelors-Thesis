@@ -26,9 +26,9 @@ Consider a set of entities $\mathcal{E}$. A formal property $P\subseteq \wp(\mat
   \end{center}
 \end{table}
 
-We call a property $P$ ``stronger'' than $P'$ (or $P'$ ``weaker'' than $P$) if $P\subseteq P'$. Its set representation contains less elements and we therefore have more information about an element that fulfils said property. The weakest property is the $\mathsf{true}$ property that is satisfied by alle elements and the strongest is $\mathsf{false}$ which is satisfied by none \cite[chapter 8]{cousot2021}. Not all properties from $\wp(\mathcal{E})$ carry a semantic meaning. We therefore only consider the set of properties of interest $C\subseteq\wp(\mathcal{E})$. If we want to analyse the signs of integers this could be $C_{sign}=\{\mathsf{false}, P_{0}, P_{pos}, P_{neg}, P_{pos0}, P_{neg0}, P_{not0}, \mathsf{true}\}$. The poset  $\langle C,\subseteq\rangle$ is called the ``concrete domain''.
+\noindent We call a property $P$ ``stronger'' than $P'$ (or $P'$ ``weaker'' than $P$) if $P\subseteq P'$. Its set representation contains less elements and we therefore have more information about an element that fulfils said property. The weakest property is the $\mathsf{true}$ property that is satisfied by alle elements and the strongest is $\mathsf{false}$ which is satisfied by none \cite[chapter 8]{cousot2021}. Not all properties from $\wp(\mathcal{E})$ carry a semantic meaning. We therefore only consider the set of properties of interest $C\subseteq\wp(\mathcal{E})$. If we want to analyse the signs of integers this could be $C_{sign}=\{\mathsf{false}, P_{0}, P_{pos}, P_{neg}, P_{pos0}, P_{neg0}, P_{not0}, \mathsf{true}\}$. The poset  $\langle C,\subseteq\rangle$ is called the ``concrete domain''.
 
-\section{Abstraction}
+\section{Abstraction}\label{sec:abstraction}
 
 Now consider a set of abstract properties $A$. This is not a power set of concrete values anymore but a set of purely semantic symbols that represent abstract properties. If there exists a Galois connection $\langle C,\subseteq\rangle \galois{\alpha}{\gamma}\langle A\sqsubseteq\rangle$, we call $\langle A\sqsubseteq\rangle$ the abstract domain, $\alpha\in C\to A$ the abstraction function and $\gamma\in A\to C$ the concretisation function \cite[chapter 11]{cousot2021}. To put the working principle of Galois connections into simple terms: $A$'s elements abstract $C$'s elements and $\sqsubseteq$ works analogous in the abstract to $\subseteq$ in the concrete. More formally: $\forall P_C\in C:\forall P_A \in A:\alpha(P_C)\sqsubseteq P_A \Longleftrightarrow P_C \subseteq \gamma(P_A)$.
 
@@ -60,7 +60,7 @@ Imagine a variable environment $\rho$, where $\rho(\mathtt{i})=1$, for example. 
 
 \input{res/abstract_function.tex}
 
-\noindent This ensures that the abstract result of an operation includes at least (but not necessarily only) the result that the operation would have in the concrete. Let us take a look at the multiplication operation \texttt{*}. Its concrete semantics $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$ is trivially defined as $\llbracket\mathtt{e_1}\rrbracket\rho \times\llbracket\mathtt{e_2}\rrbracket\rho$. When we want to interpret this operation in the abstract domain of signs $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket^\pm\rho$, we will now have to come up with a definition of sign multiplication $\times_\pm$. The most trivial of these would be $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket^\pm\rho=\top$, meaning the result is unknown. We can, however, further narrow down a more precise definition as can be seen in table \ref{table:multiply}. This satisfies our condition for an abstract operation, since $\times(x,y)\subseteq\gamma(\times_\pm(\alpha(x),\alpha(y)))$ for all $x,y\in\mathbb{Z}$ and it also makes intuitive sense, as for example a multiplication of two positive integers will result in another positive integer, a multiplication of any integer with zero will result in zero and so on.
+\noindent This ensures that the abstract result of an operation includes at least (but not necessarily only) the result that the operation would have in the concrete. Let us take a look at the multiplication operation \texttt{*}. Its concrete semantics $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$ is trivially defined as $\llbracket\mathtt{e_1}\rrbracket\rho \times\llbracket\mathtt{e_2}\rrbracket\rho$. When we want to interpret this operation in the abstract domain of signs $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$, we will now have to come up with a definition of sign multiplication $\times_\pm$. The most trivial of these would be $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho=\top$, meaning the result is unknown. We can, however, further narrow down a more precise definition as can be seen in table \ref{table:multiply}. This satisfies our condition for an abstract operation, since $\times(x,y)\subseteq\gamma(\times_\pm(\alpha(x),\alpha(y)))$ for all $x,y\in\mathbb{Z}$ and it also makes intuitive sense, as for example a multiplication of two positive integers will result in another positive integer, a multiplication of any integer with zero will result in zero and so on.
 
 
 \begin{table}[hbt]
@@ -86,7 +86,7 @@ Our simple language not only contains expressions, but also commands or statemen
 More generally the semantics of an assignment is defined as $\llbracket \texttt{i\;:=\;e} \rrbracket\rho=\rho[\mathtt{i}:=\texttt{e}]$ with $\rho[\mathtt{i}:=\texttt{e}](\mathtt{i})=\llbracket\mathtt{e}\rrbracket\rho$ \cite{cousot2011}. Commands that alter the environment are called transformations. They are basically functions in $\mathcal{R}_v\mapsto\mathcal{R}_v$ \cite{scott1971}.
 The process in an abstract interpretation is the same, with the difference being of course, that expressions are being evaluated in the abstract domain.
 
-\section{Conditionals}
+\section{Conditionals}\label{sec:conditionals}
 
 The concrete semantics for conditionals is relatively obvious. Consider the statement $\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}$. We test whether the variable $\texttt{v}_\texttt{1}$ is less equal than $\texttt{v}_\texttt{2}$ and if that is the case we execute the program branch $\texttt{p}_\texttt{1}$ and $\texttt{p}_\texttt{2}$ otherwise. The semantics for this are defined as follows \cite{scott1971}: 
 
@@ -106,7 +106,7 @@ The concrete semantics for conditionals is relatively obvious. Consider the stat
 
 \noindent whereby $\rho^{t\!t}=\rho[v_1:=v_1'][v_2:=v_2']$ is such that $v_1'\sqsubseteq v_1$ and $v_2'\sqsubseteq v_2$ and $v_1'\leq v_2'$. Analogous for $\rho^{f\!\!f}$. How  $v_1'$ and $v_2'$ are determined depends on the used abstract domain.
 
-\section{Fixpoint Analysis}
+\section{Fixpoint Analysis}\label{sec:fixpoint_analysis}
 
 The semantics for loops in the concrete are defined recursively like follows \cite{scott1971}:
 
@@ -192,16 +192,14 @@ The semantics for loops in the concrete are defined recursively like follows \ci
 
 Until this point we have been doing our abstract interpretation in the sign domain only. Let us introduce another, more precise one: The interval domain. This domain does not abstract the sign property of a scalar variable, but rather the property of which interval it is included in. An interval $[\underline{x},\overline{x}]$ has the concretisation $\gamma([\underline{x},\overline{x}])=\{z\in\mathbb{Z} \;|\; \underline{x}\leq z \leq \overline{x}\}$. Abstract expression operations follow usual interval arithmetics. For example, $[\underline{x},\overline{x}]+[\underline{y},\overline{y}]=[\underline{x}+\underline{y},\overline{x}+\overline{y}]$. Figure \ref{fig:domaincomparison} compares the sign domain to the interval domain and shows graphically how it abstracts in a more precise manner. Figure \ref{fig:intervaldomain} shows the interval lattice as a Hasse diagram.
 
-\section{The FunArray}
+\clearpage \section{The FunArray}
 
 \subsection{Abstract Array Segmentation Predicates}
 
+A FunArray predicate takes the form \funArray{\bound{e_1^1\ldots e_{m^1}^1} \fvalue{P_1} \bound{e_1^2\ldots e_{m^2}^2}[?^2] \fvalue{P_2}\ldots\allowbreak\fvalue{P_{n-1}}\allowbreak \bound{e_1^n\ldots e_{m^n}^n}[?^n]}, where $e^i_1\ldots e^i_m\in\mathbb{E}$ are expressions in normal form determining segment bounds, $P_i\in A$ are abstract element values from a chosen abstract domain $A$ and the optional $[?_i]$ signifies whether a preceding segment might be possibly empty \cite{cousot2011}. The FunArray maintains the condition that $e_1^1=\ldots=e_{m^1}^1\leq e_1^2=\ldots=e_{m^2}^2\leq\ldots\leq e_1^n=\ldots=e_{m^n}^n$, meaning that expressions in the same bound evaluate to an equal value and that the bounds are ordered. 
 \input{res/funarray_predicate.tex}
 
-A FunArray predicate takes the form \funArray{\bound{e_1^1\ldots e_{m^1}^1} \fvalue{P_1} \bound{e_1^2\ldots e_{m^2}^2}[?^2] \fvalue{P_2}\ldots\allowbreak\fvalue{P_{n-1}}\allowbreak \bound{e_1^n\ldots e_{m^n}^n}[?^n]}, where $e^i_1\ldots e^i_m\in\mathbb{E}$ are expressions in normal form determining segment bounds, $P_i\in A$ are abstract element values from a chosen abstract domain $A$ and the optional $[?_i]$ signifies whether a preceding segment might be possibly empty \cite{cousot2011}. The FunArray maintains the condition that $e_1^1=\ldots=e_{m^1}^1\leq e_1^2=\ldots=e_{m^2}^2\leq\ldots\leq e_1^n=\ldots=e_{m^n}^n$, meaning that expressions in the same bound evaluate to an equal value and that the bounds are ordered. 
-
-
-Consider the following example: \funArray{A: \bound{0 \;\; a} \fvalue{[0,10]} \bound{a +4} \fvalue{[0,0]} \bound{b}?}. This means that the array $A$ has two segments. The first one which is bound by the expressions $0$ and $a$ on its left side and by $a+4$ on its right side. All array accesses with an index $i$ with $0=a\leq i \leq a+ 4$ will return the abstract value $[0,10]$. The second segment is bound by $a+4$ and $b$. It has the value $[0,0]$ and might possibly be empty as signified by the question mark.
+\noindent Consider the following predicate for example: \funArray{A: \bound{0 \;\; a} \fvalue{[0,10]} \bound{a +4} \fvalue{[0,0]} \bound{b}?}. This means that the array $A$ has two segments. The first one which is bound by the expressions $0$ and $a$ on its left side and by $a+4$ on its right side. All array accesses with an index $i$ with $0=a\leq i \leq a+ 4$ will return the abstract value $[0,10]$. The second segment is bound by $a+4$ and $b$. It has the value $[0,0]$ and might possibly be empty as signified by the question mark.
 
 
 \subsection{Functors}

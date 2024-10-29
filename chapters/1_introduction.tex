@@ -54,19 +54,13 @@ To put it very simple, when doing abstract interpretation, we are not running th
 class Main {
   public static void main(String[] args) {
     int divisor = 458;
-    // divisor references a positive integer
+    <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} The variable \texttt{divisor} references a positive integer. \vspace{5pt}}@>
     divisor = divisor + 17;
-    // when adding to positive numbers the result
-    // will also be positive. the value of the 
-    // variable divisor must still be positive
+    <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} When adding to positive numbers , teh result will also be positive. The value of \texttt{divisor} must still be positive. \vspace{5pt}}@>
     divisor = divisor - 475;
-    // when subtracting from a positive number,
-    // the result might be negative or zero
-    // the variable divisor might potentially
-    // be zero
+    <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} When subtracting from a positive number, the result might be negative, zero or positive. Therefore \texttt{divisor} might be zero. \vspace{5pt}}@>
     int result = 1 / divisor;
-    // since divisor might be zero, this division 
-    // might potentially throw an error!
+    <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} Since \texttt{divisor} might be zero, this division may potentially throw an error! \vspace{5pt}}@>
     System.out.println(result);
   }
 }
@@ -129,7 +123,7 @@ How can we check for mistakes like these without executing the program? Of cours
 %In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
 
 
-The Goal of this thesis is to implement a static analyser employing the techniques of abstract interpretation and especially the FunArray and to evaluate its performance. In chapter \ref{chap:background} I will more formally describe what abstract interpretation and the FunArray are and how they work. Chapter \ref{chap:implementation} contains a detailed description on how I implemented the analyser and the FunArray. I will show how I altered and simplified the unification algorithm from the original idea by Cosuot, Cousot and Logozzo. I will also explain how I implemented expression and their normalisation, which is needed because FunArray bounds can only handle expressions that have been brought into a special normal form. In chapter \ref{chap:evaluation} we will then evaluate this analyser against a selection of benchmarks from SV-COMP. I will show that the analyser is able to determine non-trivial invariants for $61\%$ of the contained loops and is able to assert $10\%$ of the included proof obligations.
+The goal of this thesis is to implement a static analyser employing the techniques of abstract interpretation and especially the FunArray and to evaluate its performance. In chapter \ref{chap:background} I will more formally describe what abstract interpretation and the FunArray are and how they work. Chapter \ref{chap:implementation} contains a detailed description on how I implemented the analyser and the FunArray. I will show how I altered and simplified the unification algorithm from the original idea by Cosuot, Cousot and Logozzo (2011). I will also explain how I implemented expression and their normalisation, which is needed because FunArray bounds can only handle expressions that have been brought into a special normal form. In chapter \ref{chap:evaluation} we will then evaluate this analyser against a selection of benchmarks from SV-COMP. I will show that the analyser is able to determine non-trivial invariants for $61\%$ of the contained loops and is able to assert $10\%$ of the included proof obligations.
 
 
 
