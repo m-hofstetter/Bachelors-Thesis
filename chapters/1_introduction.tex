@@ -8,7 +8,7 @@
 %Es gibt das von Cousot
 
 
-Dividing any scalar value by zero is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But when code becomes more complex, it is often times not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
+Dividing any scalar value by zero is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But when code becomes more complex, it is often not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
 
 
 \begin{center}
@@ -56,7 +56,7 @@ class Main {
     int divisor = 458;
     <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} The variable \texttt{divisor} references a positive integer. \vspace{5pt}}@>
     divisor = divisor + 17;
-    <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} When adding to positive numbers , teh result will also be positive. The value of \texttt{divisor} must still be positive. \vspace{5pt}}@>
+    <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} When adding to positive numbers, the result will also be positive. The value of \texttt{divisor} must still be positive.\vspace{5pt}}@>
     divisor = divisor - 475;
     <@\parbox[t]{0.7\linewidth}{\rm \color{gray} \vspace{-2pt} When subtracting from a positive number, the result might be negative, zero or positive. Therefore \texttt{divisor} might be zero. \vspace{5pt}}@>
     int result = 1 / divisor;
