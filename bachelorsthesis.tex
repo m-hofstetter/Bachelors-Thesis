@@ -56,7 +56,7 @@ I hereby confirm that I have written the accompanying thesis by myself, without 
 
 \section*{Utilised Aids in Creating this Thesis}
 
-I did not rely on any LLM to produce any text in this thesis, nor any other tool automatically generating text. For writing program code i took advantage of IDE features such as auto-completion. This in parts includes the IntelliJ IDEA full line completion\footnote{\url{https://www.jetbrains.com/help/idea/full-line-code-completion.html}}, which is an auto-complete tool relying on a locally run deep learning model. It is not able to suggest any in-depth design choices or code fragments that exceed the scope of a single line.
+I did not rely on any LLM to produce any text in this thesis, nor any other tool automatically generating text. For writing program code i took advantage of IDE features such as auto-completion. This includes, in parts, the IntelliJ IDEA full line completion\footnote{\url{https://www.jetbrains.com/help/idea/full-line-code-completion.html}}, which is an auto-complete tool relying on a locally run deep learning model. It is not able to suggest any in-depth design choices or code fragments that exceed the scope of a single line.
 
 \section*{Attachments}
 
@@ -73,10 +73,12 @@ The following attachments have been submitted together with this thesis via Uni2
 
 I would like to express my deepest gratitude to my thesis advisor Gidon Ernst for extensively supporting me throughout the implementation and writing process of this thesis and for translating the utilised benchmarks into a EDSL.
 
+I would also like to thank my friends Lara and Lena for thoroughly proofreading this thesis.
+
 
 \setcounter{tocdepth}{1}
 \tableofcontents
-
+\thispagestyle{empty}
 \begin{abstract}
   In this paper I will describe how I implemented and examined an abstract static analyser utilising the FunArray abstract domain invented by Cosuot, Cousot and Logozzo. It is able to fully-automatically segment arrays and determine their content's properties. The analyser is able to work with any arbitrary scalar abstract domain, but to abstract variable values and array element values, I implemented the interval abstract domain. I will describe how I overhauled the unification algorithm for matching segment bounds of two FunArrays and how I implemented the normalisation of bound expressions. When evaluating this analyser against the SV-COMP benchmarks, it is able to determine non-trivial invariants for $61\%$ of all tested loops and proof $10\%$ of the included proof obligations.
 \end{abstract}

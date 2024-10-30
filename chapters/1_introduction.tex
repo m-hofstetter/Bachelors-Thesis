@@ -8,7 +8,7 @@
 %Es gibt das von Cousot
 
 
-Dividing any scalar value by zero is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But when code becomes more complex, it is often not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
+Dividing any scalar value by zero is undefined behaviour in most programming languages and will certainly throw an error. When an experienced programmer is writing code, they make sure to include checks to rule out this behaviour. But as code becomes more complex, it is often not that easy to manually detect when a division by zero might occur. It is therefore common to analyse code automatically to detect problems of this kind. Consider the following program written in Java:
 
 
 \begin{center}
@@ -22,7 +22,7 @@ class Main {
 \end{BVerbatim}
 \end{center}
 
-\noindent To a human observer it is immediately obvious that this snippet contains a division by zero and will result in some undesired behaviour. When executing this code snippet, the JVM will output the following error message: \texttt{Exception in thread "main" java.lang.ArithmeticException: Division by zero}. But even when only writing this faulty piece of code, without having actually executed it, our IDE will issue a warning: \texttt{Division by zero}. Apparently our IDE has some functionality built in that detects any such division by zero. How is this being accomplished? One immediate guess to this would be the assumption that it syntactically verifies that the code does not contain the string \texttt{/0} anywhere. Let us modify our snippet to check this hypothesis:
+\noindent To a human observer it is immediately obvious that this snippet contains a division by zero and will result in some undesired behaviour. When executing this code snippet, the JVM will output the following error message: \texttt{Exception in thread "main" java.lang.ArithmeticException: Division by zero}. But even when only writing this faulty piece of code, without actually executing or compiling it, our IDE will issue a warning: \texttt{Division by zero}. Apparently, our IDE has some functionality built in that detects any such division by zero. How is this being accomplished? One immediate guess would be the assumption that it syntactically verifies that the code does not contain the string \texttt{/0} anywhere. Let us modify our snippet to check this hypothesis:
 
  \begin{center}
 \begin{BVerbatim}
@@ -39,7 +39,7 @@ class Main {
 \end{center}
 
 \noindent The code is now obfuscated in such a way that a human code reviewer might not notice the division by zero on first glance. Any syntactic analysis should also be impossible. However our IDE still issues a warning: \texttt{Division by zero}. This process of analysing code without actually reviewing it, is called static analysis. This term summarises a lot of different techniques, one of which is abstract interpretation.
-To put it very simple, when doing abstract interpretation, we are not running the program on concrete values, but rather on their properties. Let us take a look our example but this time with comments on what we can conclude by only taking the scalar variables sign property into account.  
+To put it very simple, when doing abstract interpretation, we are not running the program on concrete values, but rather on their properties. Let us take a look at our example, but this time with comments on what we can conclude by only taking the scalar variables sign property into account.  
 
 
 \lstset{
@@ -92,7 +92,7 @@ class Main {
 
 
 \noindent Once again we would like to make sure that no division by zero occurs. On first sight it seems as if this was the case, but there is actually a off-by-one error hidden in the first loop and the array element at the first index will actually be a zero.
-How can we check for mistakes like these without executing the program? Of course we would be able to keep track of every property of every element on its own. However, this becomes problematic as soon as an array's length is being determined at runtime and when running it in the abstract, only certain properties are known about the length. The solution to this is the FunArray \cite{cousot2011}. It is a technique where an array is divided into symbolic segments and properties are being determined for these segments. Consider figure~\ref{fig:funarray}. It shows a graphical representation of a FunArray, that has two segments, which contain only positive and negative elements respectively. The shared bound in the middle is determined by the variable value of \texttt{i}, which itself is an abstract value. The length of the array and therefore the right bound of the second segment is also determined by an abstract value \texttt{l} and does not necessitate calculating the length in the concrete.
+How can we check for mistakes like these without executing the program? Of course, we would be able to keep track of every property of every element individually. However, this becomes problematic as soon as an array's length is being determined at runtime and when running it in the abstract, only certain properties are known about the length. The solution to this is the FunArray \cite{cousot2011}. It is a technique where an array is divided into symbolic segments and properties are being determined for these segments. Consider figure~\ref{fig:funarray}. It shows a graphical representation of a FunArray, that has two segments, which contain only positive and negative elements respectively. The shared bound in the middle is determined by the variable value of \texttt{i}, which itself is an abstract value. The length of the array, and therefore the right bound of the second segment, is also determined by an abstract value \texttt{l} and does not necessitate calculating the length in the concrete.
 
 \begin{figure}[!htb]
 \vspace{0.2cm}
@@ -123,7 +123,7 @@ How can we check for mistakes like these without executing the program? Of cours
 %In this thesis I will show how I implemented an abstract analyser that utilises the FunArray. I will then test it on a selection of Benchmarks and determine how many of the included assertion obligations can automatically be proven with this approach and how often the analyser at least determines non-trivial invariants for any loops present.
 
 
-The goal of this thesis is to implement a static analyser employing the techniques of abstract interpretation and especially the FunArray and to evaluate its performance. In chapter \ref{chap:background} I will more formally describe what abstract interpretation and the FunArray are and how they work. Chapter \ref{chap:implementation} contains a detailed description on how I implemented the analyser and the FunArray. I will show how I altered and simplified the unification algorithm from the original idea by Cosuot, Cousot and Logozzo (2011). I will also explain how I implemented expression and their normalisation, which is needed because FunArray bounds can only handle expressions that have been brought into a special normal form. In chapter \ref{chap:evaluation} we will then evaluate this analyser against a selection of benchmarks from SV-COMP. I will show that the analyser is able to determine non-trivial invariants for $61\%$ of the contained loops and is able to assert $10\%$ of the included proof obligations.
+The goal of this thesis is to implement a static analyser employing the techniques of abstract interpretation, especially the FunArray and to evaluate its performance. In chapter \ref{chap:background} I will more formally describe what abstract interpretation and the FunArray are and how they work. Chapter \ref{chap:implementation} contains a detailed description on how I implemented the analyser and the FunArray. I will show how I altered and simplified the unification algorithm from the original idea by Cosuot, Cousot and Logozzo (2011). I will also explain how I implemented expression and their normalisation, which is needed because FunArray bounds can only handle expressions that have been brought into a special normal form. In chapter \ref{chap:evaluation} we will then evaluate this analyser against a selection of benchmarks from SV-COMP. I will show that the analyser is able to determine non-trivial invariants for $61\%$ of the contained loops and is able to assert $10\%$ of the included proof obligations.
 
 
 

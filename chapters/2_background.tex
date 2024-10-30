@@ -42,8 +42,8 @@ Consider a simple programming language as defined in figure \ref{fig:bnf_simplel
 
 \section{Expression Semantics}
 
-Determining the meaning of a particular statement requires us to know the current state of the program. The expression \texttt{i + 1} has an entirely different result, depending on the value of the variable \texttt{i}, which is recorded in the program's concrete scalar variable environment. An environment is defined as a function $\rho\in\mathcal{R}_v$ with $\mathcal{R}_v \triangleq \mathbb{X}\mapsto\mathcal{V}$, where $\mathbb{X}$ is the set of syntactical variable names and $\mathcal{V}$ is the set of values they can take \cite{cousot2011}.
-Now consider the simple syntactical expression $\mathtt{e}\in\mathbb{E}$. It only contains scalar constants, scalar variable references and operators. Now $\llbracket\mathtt{e}\rrbracket\rho$ describes the semantics of \texttt{e} in the concrete variable environment $\rho$. The semantics of a variable \texttt{i} is defined as $\llbracket\mathtt{i}\rrbracket\rho=\rho(\mathtt{i})$ and the semantics of a syntactic operator $\circledast$ is defined as $\llbracket\mathtt{e_0\circledast e_1}\rrbracket\rho=\llbracket\mathtt{e_0}\rrbracket\rho \ast\llbracket\mathtt{e_1}\rrbracket\rho$ \cite{scott1971}. 
+Determining the meaning of a particular statement requires us to know the current state of the program. The expression \texttt{i + 1} has an entirely different result, depending on the value of the variable \texttt{i}, which is recorded in the program's concrete scalar variable environment. An environment is defined as a function $\rho\in\mathcal{R}_v$ with $\mathcal{R}_v \triangleq \mathbb{X}\mapsto\mathcal{V}$, where $\mathbb{X}$ is the set of syntactic variable names and $\mathcal{V}$ is the set of values they can take \cite{cousot2011}.
+Now consider the simple syntactic expression $\mathtt{e}\in\mathbb{E}$. It only contains scalar constants, scalar variable references and operators. Now $\llbracket\mathtt{e}\rrbracket\rho$ describes the semantics of \texttt{e} in the concrete variable environment $\rho$. The semantics of a variable \texttt{i} is defined as $\llbracket\mathtt{i}\rrbracket\rho=\rho(\mathtt{i})$ and the semantics of a syntactic operator $\circledast$ is defined as $\llbracket\mathtt{e_0\circledast e_1}\rrbracket\rho=\llbracket\mathtt{e_0}\rrbracket\rho \ast\llbracket\mathtt{e_1}\rrbracket\rho$ \cite{scott1971}. 
 Imagine a variable environment $\rho$, where $\rho(\mathtt{i})=1$, for example. Our previously mentioned expression \texttt{i + 1} evaluates to:
 
 \begin{equation*}
@@ -60,7 +60,7 @@ Imagine a variable environment $\rho$, where $\rho(\mathtt{i})=1$, for example. 
 
 \input{res/abstract_function.tex}
 
-\noindent This ensures that the abstract result of an operation includes at least (but not necessarily only) the result that the operation would have in the concrete. Let us take a look at the multiplication operation \texttt{*}. Its concrete semantics $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$ is trivially defined as $\llbracket\mathtt{e_1}\rrbracket\rho \times\llbracket\mathtt{e_2}\rrbracket\rho$. When we want to interpret this operation in the abstract domain of signs $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$, we will now have to come up with a definition of sign multiplication $\times_\pm$. The most trivial of these would be $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho=\top$, meaning the result is unknown. We can, however, further narrow down a more precise definition as can be seen in table \ref{table:multiply}. This satisfies our condition for an abstract operation, since $\times(x,y)\subseteq\gamma(\times_\pm(\alpha(x),\alpha(y)))$ for all $x,y\in\mathbb{Z}$ and it also makes intuitive sense, as for example a multiplication of two positive integers will result in another positive integer, a multiplication of any integer with zero will result in zero and so on.
+\noindent This ensures that the abstract result of an operation includes at least (but not necessarily only) the result that the operation would have in the concrete. Let us take a look at the multiplication operation \texttt{*}. Its concrete semantics $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$ is trivially defined as $\llbracket\mathtt{e_1}\rrbracket\rho \times\llbracket\mathtt{e_2}\rrbracket\rho$. When we want to interpret this operation in the abstract domain of signs $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho$, we will now have to come up with a definition of sign multiplication $\times_\pm$. The most trivial of these would be $\llbracket\mathtt{e_1\texttt{ * } e_2}\rrbracket\rho=\top$, meaning the result is unknown. However, we can further narrow down a more precise definition as can be seen in table \ref{table:multiply}. This satisfies our condition for an abstract operation, since $\times(x,y)\subseteq\gamma(\times_\pm(\alpha(x),\alpha(y)))$ for all $x,y\in\mathbb{Z}$ and it also makes intuitive sense, as for example a multiplication of two positive integers will result in another positive integer, a multiplication of any integer with zero will result in zero and so on.
 
 
 \begin{table}[hbt]
@@ -84,11 +84,11 @@ Imagine a variable environment $\rho$, where $\rho(\mathtt{i})=1$, for example. 
 
 Our simple language not only contains expressions, but also commands or statements that modify the environment itself. For example, consider the environment $\rho$ where $\rho(\mathtt{i})=1$. After executing the command \texttt{i := i + 1}, the value of the variable \texttt{i} changes and therefore the environment $\rho'$ after the execution of the command is different from $\rho$. We write $\llbracket \texttt{i\;:=\;i\;+\;1} \rrbracket\rho=\rho[\mathtt{i}:=\texttt{i\;+\;1}]=\rho'$, meaning the semantics of the environment $\rho$ after executing an assignment \texttt{i\;:=\;i\;+\;1} is an environment $\rho'$ where all occurrences of \texttt{i} have been replaced by \texttt{i\;+\;1}. 
 More generally the semantics of an assignment is defined as $\llbracket \texttt{i\;:=\;e} \rrbracket\rho=\rho[\mathtt{i}:=\texttt{e}]$ with $\rho[\mathtt{i}:=\texttt{e}](\mathtt{i})=\llbracket\mathtt{e}\rrbracket\rho$ \cite{cousot2011}. Commands that alter the environment are called transformations. They are basically functions in $\mathcal{R}_v\mapsto\mathcal{R}_v$ \cite{scott1971}.
-The process in an abstract interpretation is the same, with the difference being of course, that expressions are being evaluated in the abstract domain.
+The process in an abstract interpretation is the same, with the difference being, that expressions are being evaluated in the abstract domain.
 
 \section{Conditionals}\label{sec:conditionals}
 
-The concrete semantics for conditionals is relatively obvious. Consider the statement $\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}$. We test whether the variable $\texttt{v}_\texttt{1}$ is less equal than $\texttt{v}_\texttt{2}$ and if that is the case we execute the program branch $\texttt{p}_\texttt{1}$ and $\texttt{p}_\texttt{2}$ otherwise. The semantics for this are defined as follows \cite{scott1971}: 
+The concrete semantics for conditionals is relatively obvious. Consider the statement $\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}$. We test whether the variable $\texttt{v}_\texttt{1}$ is less equal than $\texttt{v}_\texttt{2}$, and if that is the case, we execute the program branch $\texttt{p}_\texttt{1}$ and $\texttt{p}_\texttt{2}$ otherwise. The semantics for this are defined as follows \cite{scott1971}: 
 
 \begin{center}
 	$\llbracket\texttt{if v}_\texttt{1}\texttt{<=v}_\texttt{2} \texttt{ then p}_\texttt{1} \texttt{ else p}_\texttt{2}\rrbracket\rho = 
@@ -119,10 +119,10 @@ The semantics for loops in the concrete are defined recursively like follows \ci
 \end{center} 
 \vspace{2mm}
 
-\noindent Once again we face the problem in abstract interpretation whether and when the condition \texttt{b} is satisfied. Instead we will relay on a technique called fixpoint analysis. Basically we satisfy the condition \texttt{b} and then apply the command \texttt{p} until we reach a fixpoint, meaning that the state $\rho$ does not change anymore when applying \texttt{p} \cite{cousot1977}. Let us regard the application of the program \texttt{p} as a function $f: \mathcal{R}_v\mapsto \mathcal{R}_v$. Now $\rho^0$ describes the variable environment before entering the loop, $\rho^n=f(\rho^{n-1})$ describes the environment after executing \texttt{p} $n$ times. When repeatedly executing $f$, we obtain a sequence that follows one of the three following patterns:
+\noindent Once again, we face the problem in abstract interpretation whether and when the condition \texttt{b} is satisfied. Instead we will relay on a technique called fixpoint analysis. Basically, we satisfy the condition \texttt{b} and then apply the command \texttt{p} until we reach a fixpoint, meaning that the state $\rho$ does not change anymore when applying \texttt{p} \cite{cousot1977}. Let us regard the application of the program \texttt{p} as a function $f: \mathcal{R}_v\mapsto \mathcal{R}_v$. Now $\rho^0$ describes the variable environment before entering the loop, $\rho^n=f(\rho^{n-1})$ describes the environment after executing \texttt{p} $n$ times. When repeatedly executing $f$, we obtain a sequence that follows one of the three following patterns:
 
 \begin{enumerate}
-	\item A continuous sequence, where we reach a state that has not been obtained before after each loop pass.\\
+	\item A continuous sequence, where we reach a state, that has not been obtained previously, after each loop pass.\\
 \begin{center}
 	\begin{tikzpicture}
 	\node (A) at (0,0) {$\rho^0$};
@@ -139,7 +139,7 @@ The semantics for loops in the concrete are defined recursively like follows \ci
 \end{tikzpicture}
 \end{center}
 
-	\item \parbox[t]{\linewidth}{A sequence that ends in a cycle, meaning the sequence will repeat multiple states for ever.\\
+	\item \parbox[t]{\linewidth}{A sequence that ends in a cycle, meaning the sequence will repeat multiple states forever.\\
 \begin{center}
 	\begin{tikzpicture}
 	\node (A) at (0,0) {$\rho^0$};
@@ -190,13 +190,13 @@ The semantics for loops in the concrete are defined recursively like follows \ci
 
 \input{res/hasse_interval.tex}
 
-Until this point we have been doing our abstract interpretation in the sign domain only. Let us introduce another, more precise one: The interval domain. This domain does not abstract the sign property of a scalar variable, but rather the property of which interval it is included in. An interval $[\underline{x},\overline{x}]$ has the concretisation $\gamma([\underline{x},\overline{x}])=\{z\in\mathbb{Z} \;|\; \underline{x}\leq z \leq \overline{x}\}$. Abstract expression operations follow usual interval arithmetics. For example, $[\underline{x},\overline{x}]+[\underline{y},\overline{y}]=[\underline{x}+\underline{y},\overline{x}+\overline{y}]$. Figure \ref{fig:domaincomparison} compares the sign domain to the interval domain and shows graphically how it abstracts in a more precise manner. Figure \ref{fig:intervaldomain} shows the interval lattice as a Hasse diagram.
+Until this point, we have been doing our abstract interpretation in the sign domain only. Let us introduce another, more precise one: The interval domain. This domain does not abstract the sign property of a scalar variable, but rather the property of which interval it is included in. An interval $[\underline{x},\overline{x}]$ has the concretisation $\gamma([\underline{x},\overline{x}])=\{z\in\mathbb{Z} \;|\; \underline{x}\leq z \leq \overline{x}\}$. Abstract expression operations follow usual interval arithmetics. For example, $[\underline{x},\overline{x}]+[\underline{y},\overline{y}]=[\underline{x}+\underline{y},\overline{x}+\overline{y}]$. Figure \ref{fig:domaincomparison} compares the sign domain to the interval domain and shows graphically how it abstracts in a more precise manner. Figure \ref{fig:intervaldomain} shows the interval lattice as a Hasse diagram.
 
 \clearpage \section{The FunArray}
 
 \subsection{Abstract Array Segmentation Predicates}
 
-A FunArray predicate takes the form \funArray{\bound{e_1^1\ldots e_{m^1}^1} \fvalue{P_1} \bound{e_1^2\ldots e_{m^2}^2}[?^2] \fvalue{P_2}\ldots\allowbreak\fvalue{P_{n-1}}\allowbreak \bound{e_1^n\ldots e_{m^n}^n}[?^n]}, where $e^i_1\ldots e^i_m\in\mathbb{E}$ are expressions in normal form determining segment bounds, $P_i\in A$ are abstract element values from a chosen abstract domain $A$ and the optional $[?_i]$ signifies whether a preceding segment might be possibly empty \cite{cousot2011}. The FunArray maintains the condition that $e_1^1=\ldots=e_{m^1}^1\leq e_1^2=\ldots=e_{m^2}^2\leq\ldots\leq e_1^n=\ldots=e_{m^n}^n$, meaning that expressions in the same bound evaluate to an equal value and that the bounds are ordered. 
+A FunArray predicate, as depicted in figure \ref{fig:funarraypredicate}, takes the form \funArray{\bound{e_1^1\ldots e_{m^1}^1} \fvalue{P_1} \bound{e_1^2\ldots e_{m^2}^2}[?^2] \fvalue{P_2}\ldots\allowbreak\fvalue{P_{n-1}}\allowbreak \bound{e_1^n\ldots e_{m^n}^n}[?^n]}, where $e^i_1\ldots e^i_m\in\mathbb{E}$ are expressions in normal form determining segment bounds, $P_i\in A$ are abstract element values from a chosen abstract domain $A$ and the optional $[?_i]$ signifies whether a preceding segment might be possibly empty \cite{cousot2011}. The FunArray maintains the condition that $e_1^1=\ldots=e_{m^1}^1\leq e_1^2=\ldots=e_{m^2}^2\leq\ldots\leq e_1^n=\ldots=e_{m^n}^n$, meaning that expressions in the same bound evaluate to an equal value and that the bounds are ordered. 
 \input{res/funarray_predicate.tex}
 
 \noindent Consider the following predicate for example: \funArray{A: \bound{0 \;\; a} \fvalue{[0,10]} \bound{a +4} \fvalue{[0,0]} \bound{b}?}. This means that the array $A$ has two segments. The first one which is bound by the expressions $0$ and $a$ on its left side and by $a+4$ on its right side. All array accesses with an index $i$ with $0=a\leq i \leq a+ 4$ will return the abstract value $[0,10]$. The second segment is bound by $a+4$ and $b$. It has the value $[0,0]$ and might possibly be empty as signified by the question mark.
@@ -223,7 +223,7 @@ An array access \texttt{A[e]} in the FunArray domain is not as trivial as in a c
 
 An array is modified by the array assignment \texttt{A[i] = e}. Its semantics is defined as follows: $\llbracket\texttt{A[i] = e}\rrbracket\rho=\rho[A:=A']$, meaning the array $A: B_1P_1B_2[?_1]\ldots P_{n-1}\allowbreak{}B_n[?_{n-1}]$ has been replaced by the modified $A': B_1P_1B_2[?_1]\ldots\allowbreak B_l[?_l] (\bigsqcup^{g-1}_{k=l}P_k)\allowbreak\, \{\,\llbracket\texttt{i}\rrbracket\,\}?\, \llbracket\texttt{e}\rrbracket \allowbreak\,\{\,\llbracket\texttt{i}\rrbracket+1\,\}\, \allowbreak(\bigsqcup^{g-1}_{k=l}P_k) B_g?\ldots \allowbreak P_{n-1}B_n[?_{n-1}]$, whereby $B_l\leq\llbracket\texttt{i}\rrbracket\leq B_g$.
 
-When modifying variables in the state, the FunArray predicates also need to be modified as they might contain that variable. consider an array \funArray{A: \bound{a} \fvalue{P_1} \bound{b} \fvalue{P_2} \bound{c}}. If there is an assignment \texttt{b := b+1}, the FunArray needs to be modified to \funArray{A': \bound{a} \fvalue{P_1} \bound{b-1} \fvalue{P_2} \bound{c}}, so that it is still correct. 
+When modifying variables in the state, the FunArray predicates also need to be modified as they might contain that variable. Consider an array \funArray{A: \bound{a} \fvalue{P_1} \bound{b} \fvalue{P_2} \bound{c}}. If there is an assignment \texttt{b := b+1}, the FunArray needs to be modified to \funArray{A': \bound{a} \fvalue{P_1} \bound{b-1} \fvalue{P_2} \bound{c}}, so that it is still correct. 
 
 
 
