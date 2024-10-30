@@ -20,7 +20,8 @@
 \usepackage{adjustbox}
 \usepackage{pgfplots}
 
-
+\usepackage{chngcntr}
+\counterwithout{footnote}{chapter}
 
 \lstset{escapeinside={<@}{@>}}
 % <@\textcolor{red}{red text}@>
@@ -56,7 +57,7 @@ I hereby confirm that I have written the accompanying thesis by myself, without 
 
 \section*{Utilised Aids in Creating this Thesis}
 
-I did not rely on any LLM to produce any text in this thesis, nor any other tool automatically generating text. For writing program code i took advantage of IDE features such as auto-completion. This includes, in parts, the IntelliJ IDEA full line completion\footnote{\url{https://www.jetbrains.com/help/idea/full-line-code-completion.html}}, which is an auto-complete tool relying on a locally run deep learning model. It is not able to suggest any in-depth design choices or code fragments that exceed the scope of a single line.
+I did not rely on any LLM to produce any text in this thesis, nor any other tool automatically generating text. For writing program code i took advantage of IDE features such as auto-completion. This includes, in parts, the IntelliJ IDEA full line completion\footnote{More information about this tool online at \url{https://www.jetbrains.com/help/idea/full-line-code-completion.html}.}, which is an auto-complete tool relying on a locally run deep learning model. It is not able to suggest any in-depth design choices or code fragments that exceed the scope of a single line.
 
 \section*{Attachments}
 
